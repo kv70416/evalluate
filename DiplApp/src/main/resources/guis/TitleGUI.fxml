@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.TextAlignment?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:id="titleBox"
+    alignment="CENTER"
+    style="
+        -fx-background-image: url('/img/background1.jpg');
+        -fx-background-size: cover;
+    "
+>
+    <padding>
+        <Insets top="12.0" bottom="12.0" right="12.0" left="12.0" />
+    </padding>
+    <children>
+        <Text fx:id="titleText"
+            text="Aplikacija"
+            textAlignment="CENTER"
+            style="
+                -fx-font-size: 42;
+            "
+        />
+        <Text fx:id="subtitleText"
+            text="Modularna aplikacija za bodovanje programskih rješenja."
+            textAlignment="CENTER"
+            style="
+                -fx-font-size: 20;
+            "
+        >
+            <VBox.margin>
+                <Insets top="20.0" bottom="50.0" />
+            </VBox.margin>
+        </Text>
+        <Button fx:id="startBtn"
+            text="Start"
+            style="
+                -fx-font-size: 20;
+            "
+        />
+    </children>
+</VBox>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:id="ssBox"
+    spacing="12.0"
+    prefWidth="${ssBox.parent.width}"
+    prefHeight="${ssBox.parent.height}"
+>
+    <children>
+        
+        <Label text="STEP 3: Solution scoring"
+            style="
+                -fx-font-size: 16;
+                -fx-font-weight: bold;
+            "
+        />
+        
+        <Label text="Choose modules for scoring the solutions." />
+        
+        <HBox
+            spacing="8.0"
+        >
+            <MenuButton fx:id="ssModuleMenu" text="Choose a module..." />
+            <Button fx:id="ssModuleConfirmBtn" text="Add" disable="true" />
+        </HBox>
+        
+        <VBox fx:id="ffInfoBox"
+            spacing="12.0"
+            style="
+                -fx-border-style: solid;
+                -fx-border-color: #105B3D;
+                -fx-border-width: 1;
+                -fx-border-radius: 4;
+            "
+        >
+            <padding>
+                <Insets top="6.0" bottom="6.0" right="6.0" left="6.0" />
+            </padding>
+            <children>
+                <HBox>
+                    <children>
+                        <Label text="Description: " />
+                        <Label fx:id="ssModuleDescription" text="-" />
+                    </children>
+                </HBox>
+                <HBox>
+                    <children>
+                        <Label text="Module ID: " />
+                        <Label fx:id="ssModuleID" text="-" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+        
+        <TabPane fx:id="ssSubmenuTabs"
+            VBox.vgrow="ALWAYS"
+            style="
+                -fx-background-color: #BFEFDC;
+                -fx-background-radius: 4;
+                -fx-border-style: solid;
+                -fx-border-color: #105B3D;
+                -fx-border-width: 1;
+                -fx-border-radius: 4;
+            "
+        />
+        
+        <!-- TODO combo submenu -->
+        
+    </children>
+</VBox>

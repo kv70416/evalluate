@@ -1,0 +1,48 @@
+plugins {
+  id 'java'
+  id 'jacoco'
+  id 'application'
+  id 'org.openjfx.javafxplugin' version '0.0.9'
+}
+
+
+mainClassName = 'mainapp.Main'
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation     'junit:junit:4.13'
+    
+    //compile fileTree(dir: '../../ModuleProjects', include: '*/*/build/libs/*.jar')
+    //runtime fileTree(dir: '../../ModuleProjects', include: '*/*/build/libs/*.jar')
+}
+
+javafx {
+    version = "15.0.1"
+    modules = [ 'javafx.controls', 'javafx.fxml' ]
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs = ["src/main/resources"]
+            includes = ["**/*.fxml", "**/*.css", "**/*.jpg"]
+        }
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+}
+
+
+//run {
+//    doFirst {
+//        sourceSets.main.runtimeClasspath.each { println it }
+//        println ""
+//        sourceSets.main.compileClasspath.each { println it }
+//    }
+//}

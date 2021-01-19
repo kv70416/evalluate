@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Text?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:id="ffBox"
+    style="
+        -fx-background-image: url('/img/background1.jpg');
+        -fx-background-size: cover;
+    "
+>
+    <padding>
+        <Insets top="12.0" bottom="12.0" right="12.0" left="12.0" />
+    </padding>
+    <children>
+        <Text fx:id="miniTitleText"
+            text="Aplikacija"
+            style="
+                -fx-font-size: 20;
+            "
+        />
+        <Pane fx:id="phasePane"
+            VBox.vgrow="ALWAYS"
+        >
+            <VBox.margin>
+                <Insets top="20.0" bottom="20.0" />
+            </VBox.margin>
+        </Pane>
+        <HBox fx:id="buttonBox">
+            <children>
+                <Button fx:id="nextBtn" text="Continue" disable="true" />
+            </children>
+        </HBox>
+    </children>
+</VBox> 

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ScrollPane?>
+
+<ScrollPane xmlns:fx="http://javafx.com/fxml" fx:id="resultsPane"
+    prefWidth="${resultsPane.parent.width}"
+    prefHeight="${resultsPane.parent.height}"
+    styleClass="edge-to-edge"
+>
+    <VBox
+        spacing="12.0"
+    >
+        <children>
+            
+            <Label text="Solution Scores"
+                style="
+                    -fx-font-size: 16;
+                    -fx-font-weight: bold;
+                "
+            />
+
+            <VBox fx:id="solutionScoresBox" 
+                spacing="12.0"
+            >
+                <padding>
+                    <Insets right="8.0" left="8.0" />
+                </padding>
+            </VBox>
+            
+            <Label text="Duplicate Ratings"
+                style="
+                    -fx-font-size: 16;
+                    -fx-font-weight: bold;
+                "
+            />
+
+            <VBox fx:id="duplicateRatingsBox" 
+                spacing="12.0"
+            >
+                <padding>
+                    <Insets right="8.0" left="8.0" />
+                </padding>
+            </VBox>
+            
+        </children>
+    </VBox>
+</ScrollPane>
