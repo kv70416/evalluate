@@ -7,7 +7,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import mainapp.configurations.FileFetchingConfiguration;
 import mainapp.moduleInterfaces.IFileFetchingModule;
@@ -15,7 +14,6 @@ import mainapp.services.FileFetchingService;
 import mainapp.services.ModuleService;
 
 public class FileFetchingGUIController extends ModuleGUIController {
-    public VBox ffBox = null;
     public MenuButton ffModuleMenu = null;
     public Button ffModuleConfirmBtn = null;
     public Label ffModuleDescription = null;
@@ -32,7 +30,7 @@ public class FileFetchingGUIController extends ModuleGUIController {
         ffConfig = config;
     }
     
-    public boolean setupFileFetchingModuleGUI(Stage mainWindow, Runnable mainSceneRefresh) {
+    public boolean setupFileFetchingModuleGUI(Stage mainWindow, Runnable configRefresh) {
         if (ffService == null || ffConfig == null) {
             return false;
         }
@@ -40,13 +38,13 @@ public class FileFetchingGUIController extends ModuleGUIController {
         ffModuleConfirmBtn.setOnAction(ev -> {
             ffConfig.selectModule(ffService, viewedModuleID);
             
-            showModuleGUI(ffConfig.getSelectedModuleIndex(), mainWindow, mainSceneRefresh);
+            showModuleGUI(ffConfig.getSelectedModuleIndex(), mainWindow, configRefresh);
             ffModuleConfirmBtn.setDisable(true);
-            mainSceneRefresh.run();
+            configRefresh.run();
         });
         
         List<ModuleService<IFileFetchingModule>.ModuleInformation> infos = ffService.getAllModuleInfo();
-        for (ModuleService.ModuleInformation info : infos) {
+        for (ModuleService<IFileFetchingModule>.ModuleInformation info : infos) {
             MenuItem item = new MenuItem(info.getName());
             item.setOnAction(ev -> {
                 viewedModuleID = info.getID();
@@ -65,9 +63,9 @@ public class FileFetchingGUIController extends ModuleGUIController {
         return true;
     }
     
-    private boolean showModuleGUI(int moduleIndex, Stage mainWindow, Runnable mainSceneRefresh) {
+    private boolean showModuleGUI(int moduleIndex, Stage mainWindow, Runnable configRefresh) {
         ffSubmenuPane.getChildren().clear();
-        Node moduleGUI = ffService.getModuleGUI(moduleIndex, mainWindow, mainSceneRefresh);
+        Node moduleGUI = ffService.getModuleGUI(moduleIndex, mainWindow, configRefresh);
         if (moduleGUI != null) {
             return ffSubmenuPane.getChildren().add(moduleGUI);
         }
