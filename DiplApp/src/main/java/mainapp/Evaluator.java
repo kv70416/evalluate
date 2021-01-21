@@ -43,45 +43,64 @@ public class Evaluator {
         ssConfig = new SolutionScoringConfiguration();
         ddConfig = new DuplicateDetectionConfiguration();
     }
+
     
-    public void runEvaluationCycle(MainGUIController mainController, Stage mainWindow) {
-        mainController.showFileFecthingPhase(mainWindow, ffService, ffConfig, () -> {
-            mainController.showCodeCompilationPhase(mainWindow, ccService, ccConfig, () -> {
-                mainController.showSolutionScoringPhase(mainWindow, ssService, ssConfig, () -> {
-                    mainController.showDuplicateDetectionPhase(mainWindow, ddService, ddConfig, () -> {
-                        mainController.showEvaluationPhase();
+    public void runEvaluationCycle(MainGUIController ctrl, Stage mainWindow) {
+        goToFileFetchingPhase(ctrl, mainWindow);
+    }
 
-                        Task<Void> evalTask = new Task<>() {
-                            @Override
-                            protected Void call() throws Exception {
 
-                                try {
-
-                                evaluate();
-
-                                }
-                                catch (Exception e) {
-                                    System.out.println(e.getClass());
-                                    System.out.println(e.getMessage());
-                                    e.printStackTrace();
-                                }
-
-                                return null;
-                            }
-                        };
-
-                        evalTask.setOnSucceeded(e -> {
-                            mainController.showResultsPhase(results, dupRatings);
-                        });
-
-                        Thread evalThread = new Thread(evalTask);
-                        evalThread.start();
-                    });
-                });
-            });
-        });
+    private void goToFileFetchingPhase(MainGUIController ctrl, Stage mainWindow) {
+        ctrl.prepareFileFetchingPhase(mainWindow, ffService, ffConfig);
+        ctrl.setNextPhase(() -> { goToCodeCompilationPhase(ctrl, mainWindow); });
+        ctrl.showPreparedPhase();
     }
     
+    private void goToCodeCompilationPhase(MainGUIController ctrl, Stage mainWindow) {
+        ctrl.prepareCodeCompilationPhase(mainWindow, ccService, ccConfig);
+        ctrl.setNextPhase(() -> { goToSolutionScoringPhase(ctrl, mainWindow); });
+        ctrl.showPreparedPhase();
+    }
+
+    private void goToSolutionScoringPhase(MainGUIController ctrl, Stage mainWindow) {
+        ctrl.prepareSolutionScoringPhase(mainWindow, ssService, ssConfig);
+        ctrl.setNextPhase(() -> { goToDuplicateDetectionPhase(ctrl, mainWindow); });
+        ctrl.showPreparedPhase();
+    }
+
+    private void goToDuplicateDetectionPhase(MainGUIController ctrl, Stage mainWindow) {
+        ctrl.prepareDuplicateDetectionPhase(mainWindow, ddService, ddConfig);
+        ctrl.setNextPhase(() -> { goToEvaluationPhase(ctrl);});
+        ctrl.showPreparedPhase();
+    }
+
+    private void goToEvaluationPhase(MainGUIController ctrl) {
+        ctrl.prepareEvaluationPhase();
+        ctrl.removeNextPhase();
+        ctrl.showPreparedPhase();
+
+        Task<Void> evalTask = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                evaluate();
+                return null;
+            }
+        };
+
+        evalTask.setOnSucceeded(e -> {
+            goToResultsPhase(ctrl);
+        });
+
+        Thread evalThread = new Thread(evalTask);
+        evalThread.start();
+    }
+
+    private void goToResultsPhase(MainGUIController ctrl) {
+        ctrl.prepareResultsPhase(results, dupRatings);
+        ctrl.removeNextPhase();
+        ctrl.showPreparedPhase();
+    }
+
     
     private void evaluate() {
         System.out.println("EVALUATING.......");
