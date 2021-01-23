@@ -1,6 +1,5 @@
 package mainapp;
 
-import java.io.IOException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -27,49 +26,57 @@ public class MainApplication extends Application {
         
     }
     
-    public void showTitleScene(Stage primaryStage) throws Exception {
-        // load the title gui
+    public void showTitleScene(Stage primaryStage) {
+        // prepare gui loader
         FXMLLoader titleLoader = new FXMLLoader();
         titleLoader.setController(new TitleGUIController());
         titleLoader.setLocation(getClass().getResource("/guis/TitleGUI.fxml"));
-        VBox titleVBox = titleLoader.<VBox>load();
         
-        // set the scene to show the title gui
-        Scene titleScene = new Scene(titleVBox);
-        primaryStage.setScene(titleScene);
-        
-        // bind the start button to start the evaluation cycle
-        titleLoader.<TitleGUIController>getController().startBtn.setOnAction(ev -> {
-            try {
-                startEvaluationCycle(primaryStage);
-            }
-            catch (IOException e) {
-                // TODO
-                System.err.println(e.getMessage());
-            }
-        });
+        try {
+            //load the title gui
+            VBox titleVBox = titleLoader.<VBox>load();
 
-        // show the window
-        primaryStage.show();
+            // set the scene to show the title gui
+            Scene titleScene = new Scene(titleVBox);
+            primaryStage.setScene(titleScene);
+
+            // bind the start button to start the evaluation cycle
+            titleLoader.<TitleGUIController>getController().startBtn.setOnAction(ev -> {
+                startEvaluationCycle(primaryStage);
+            });
+    
+            // show the window
+            primaryStage.show();
+        } catch (Exception e) {
+            ErrorWindow ew = new ErrorWindow("Application GUI load failed.");
+            ew.showAlone();
+        }
     }
     
-    public void startEvaluationCycle(Stage primaryStage) throws IOException {
-        // load the configuration phase gui
+    public void startEvaluationCycle(Stage primaryStage) {
+        // prepare gui loader
         FXMLLoader mainLoader = new FXMLLoader();
         mainLoader.setController(new MainGUIController());
         mainLoader.setLocation(getClass().getResource("/guis/MainGUI.fxml"));
-        VBox mainVBox = mainLoader.<VBox>load();
-        
-        // set the scene to show the configuration phase gui
-        Scene mainScene = new Scene(mainVBox);
-        primaryStage.setScene(mainScene);
 
-        // run evaluation cycle
-        evaluator = new Evaluator();
-        evaluator.runEvaluationCycle(mainLoader.<MainGUIController>getController(), primaryStage);
+        try {
+            // load the configuration phase gui
+            VBox mainVBox = mainLoader.<VBox>load();
+
+            // set the scene to show the configuration phase gui
+            Scene mainScene = new Scene(mainVBox);
+            primaryStage.setScene(mainScene);
+
+            // run evaluation cycle
+            evaluator = new Evaluator();
+            evaluator.runEvaluationCycle(mainLoader.<MainGUIController>getController(), primaryStage);
+        } catch (Exception e) {
+            ErrorWindow ew = new ErrorWindow("Evaluation cycle interrupted by an error.");
+            ew.showOverStage(primaryStage);
+        }
     }
         
-    public static void main(String[] args) {
+    public static void launchApp(String[] args) {
         launch(args);
     }
 
