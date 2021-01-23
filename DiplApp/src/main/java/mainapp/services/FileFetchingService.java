@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.ServiceLoader;
 import mainapp.configurations.FileFetchingConfiguration;
 import mainapp.configurations.ModuleConfiguration;
-import mainapp.moduleFactoryInterfaces.IFileFetchingModuleFactory;
-import mainapp.moduleInterfaces.IFileFetchingModule;
+import mainapp.modules.factoryinterfaces.IFileFetchingModuleFactory;
+import mainapp.modules.interfaces.IFileFetchingModule;
 
 public class FileFetchingService extends ModuleService<IFileFetchingModule> {
         

@@ -1,4 +1,4 @@
-package mainapp.moduleInterfaces;
+package mainapp.modules.interfaces;
 
 import java.util.List;
 import java.util.Map;

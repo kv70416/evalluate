@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.ServiceLoader;
 import mainapp.configurations.ModuleConfiguration;
 import mainapp.configurations.SolutionScoringConfiguration;
-import mainapp.moduleFactoryInterfaces.ISolutionScoringModuleFactory;
-import mainapp.moduleInterfaces.ISolutionScoringModule;
+import mainapp.modules.factoryinterfaces.ISolutionScoringModuleFactory;
+import mainapp.modules.interfaces.ISolutionScoringModule;
 
 public class SolutionScoringService extends ModuleService<ISolutionScoringModule> {
     

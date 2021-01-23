@@ -1,4 +1,4 @@
-package mainapp.moduleInterfaces;
+package mainapp.modules.interfaces;
 
 import javafx.scene.Node;
 import javafx.stage.Stage;

@@ -1,6 +1,6 @@
-package mainapp.moduleFactoryInterfaces;
+package mainapp.modules.factoryinterfaces;
 
-import mainapp.moduleInterfaces.ICodeCompilationModule;
+import mainapp.modules.interfaces.ICodeCompilationModule;
 
 public interface ICodeCompilationModuleFactory extends IModuleFactory<ICodeCompilationModule> {
     

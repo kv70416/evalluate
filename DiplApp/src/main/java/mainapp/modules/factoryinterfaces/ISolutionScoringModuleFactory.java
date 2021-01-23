@@ -1,6 +1,6 @@
-package mainapp.moduleFactoryInterfaces;
+package mainapp.modules.factoryinterfaces;
 
-import mainapp.moduleInterfaces.ISolutionScoringModule;
+import mainapp.modules.interfaces.ISolutionScoringModule;
 
 public interface ISolutionScoringModuleFactory extends IModuleFactory<ISolutionScoringModule> {
     

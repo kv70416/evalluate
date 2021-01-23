@@ -9,7 +9,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import mainapp.configurations.CodeCompilationConfiguration;
-import mainapp.moduleInterfaces.ICodeCompilationModule;
+import mainapp.modules.interfaces.ICodeCompilationModule;
 import mainapp.services.CodeCompilationService;
 import mainapp.services.ModuleService;
 

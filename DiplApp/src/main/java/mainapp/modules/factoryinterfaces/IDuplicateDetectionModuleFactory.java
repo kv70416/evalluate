@@ -1,6 +1,6 @@
-package mainapp.moduleFactoryInterfaces;
+package mainapp.modules.factoryinterfaces;
 
-import mainapp.moduleInterfaces.IDuplicateDetectionModule;
+import mainapp.modules.interfaces.IDuplicateDetectionModule;
 
 public interface IDuplicateDetectionModuleFactory extends IModuleFactory<IDuplicateDetectionModule> {
     

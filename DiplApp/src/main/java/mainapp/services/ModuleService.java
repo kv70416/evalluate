@@ -5,8 +5,8 @@ import java.util.List;
 import javafx.scene.Node;
 import javafx.stage.Stage;
 import mainapp.configurations.ModuleConfiguration;
-import mainapp.moduleInterfaces.IModule;
-import mainapp.moduleFactoryInterfaces.IModuleFactory;
+import mainapp.modules.interfaces.IModule;
+import mainapp.modules.factoryinterfaces.IModuleFactory;
 
 public abstract class ModuleService<IModuleType extends IModule> {
     

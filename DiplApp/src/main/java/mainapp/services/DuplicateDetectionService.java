@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import mainapp.configurations.DuplicateDetectionConfiguration;
 import mainapp.configurations.ModuleConfiguration;
-import mainapp.moduleFactoryInterfaces.IDuplicateDetectionModuleFactory;
-import mainapp.moduleInterfaces.IDuplicateDetectionModule;
+import mainapp.modules.factoryinterfaces.IDuplicateDetectionModuleFactory;
+import mainapp.modules.interfaces.IDuplicateDetectionModule;
 
 public class DuplicateDetectionService extends ModuleService<IDuplicateDetectionModule> {
     

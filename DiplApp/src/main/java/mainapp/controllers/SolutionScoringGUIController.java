@@ -9,7 +9,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
 import mainapp.configurations.SolutionScoringConfiguration;
-import mainapp.moduleInterfaces.ISolutionScoringModule;
+import mainapp.modules.interfaces.ISolutionScoringModule;
 import mainapp.services.ModuleService;
 import mainapp.services.SolutionScoringService;
 

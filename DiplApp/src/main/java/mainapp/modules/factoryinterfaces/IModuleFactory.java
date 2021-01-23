@@ -1,6 +1,6 @@
-package mainapp.moduleFactoryInterfaces;
+package mainapp.modules.factoryinterfaces;
 
-import mainapp.moduleInterfaces.IModule;
+import mainapp.modules.interfaces.IModule;
 
 public interface IModuleFactory<IModuleType extends IModule> {
     public String moduleID();

@@ -9,7 +9,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
 import mainapp.configurations.DuplicateDetectionConfiguration;
-import mainapp.moduleInterfaces.IDuplicateDetectionModule;
+import mainapp.modules.interfaces.IDuplicateDetectionModule;
 import mainapp.services.DuplicateDetectionService;
 import mainapp.services.ModuleService;
 

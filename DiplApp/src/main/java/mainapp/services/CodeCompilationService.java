@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.ServiceLoader;
 import mainapp.configurations.CodeCompilationConfiguration;
 import mainapp.configurations.ModuleConfiguration;
-import mainapp.moduleFactoryInterfaces.ICodeCompilationModuleFactory;
-import mainapp.moduleInterfaces.ICodeCompilationModule;
+import mainapp.modules.factoryinterfaces.ICodeCompilationModuleFactory;
+import mainapp.modules.interfaces.ICodeCompilationModule;
 
 public class CodeCompilationService extends ModuleService<ICodeCompilationModule> {
         

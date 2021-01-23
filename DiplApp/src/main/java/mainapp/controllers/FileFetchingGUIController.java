@@ -9,7 +9,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import mainapp.configurations.FileFetchingConfiguration;
-import mainapp.moduleInterfaces.IFileFetchingModule;
+import mainapp.modules.interfaces.IFileFetchingModule;
 import mainapp.services.FileFetchingService;
 import mainapp.services.ModuleService;
 
