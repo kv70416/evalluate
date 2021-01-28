@@ -3,14 +3,15 @@ package mainapp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import mainapp.configurations.SolutionScoringConfiguration;
+import mainapp.duplicateratings.DuplicateRatings;
+import mainapp.results.Results;
 import mainapp.configurations.FileFetchingConfiguration;
 import mainapp.configurations.CodeCompilationConfiguration;
 import java.util.List;
 import java.util.Map;
-import javafx.concurrent.Task;
-import javafx.stage.Stage;
+
+import javafx.application.Platform;
 import mainapp.configurations.DuplicateDetectionConfiguration;
-import mainapp.controllers.MainGUIController;
 import mainapp.services.CodeCompilationService;
 import mainapp.services.DuplicateDetectionService;
 import mainapp.services.FileFetchingService;
@@ -31,8 +32,9 @@ public class Evaluator {
     private Results results = null;
     private DuplicateRatings dupRatings = null;
     
+    private SceneMediator mediator = null;
     
-    public Evaluator() {
+    public Evaluator(SceneMediator mediator) {
         ffService = new FileFetchingService();
         ccService = new CodeCompilationService();
         ssService = new SolutionScoringService();
@@ -42,195 +44,340 @@ public class Evaluator {
         ccConfig = new CodeCompilationConfiguration();
         ssConfig = new SolutionScoringConfiguration();
         ddConfig = new DuplicateDetectionConfiguration();
-    }
 
-    
-    public void runEvaluationCycle(MainGUIController ctrl, Stage mainWindow) {
-        goToFileFetchingPhase(ctrl, mainWindow);
+        this.mediator = mediator;
     }
 
 
-    private void goToFileFetchingPhase(MainGUIController ctrl, Stage mainWindow) {
-        ctrl.prepareFileFetchingPhase(mainWindow, ffService, ffConfig);
-        ctrl.setNextPhase(() -> { goToCodeCompilationPhase(ctrl, mainWindow); });
-        ctrl.showPreparedPhase();
-    }
-    
-    private void goToCodeCompilationPhase(MainGUIController ctrl, Stage mainWindow) {
-        ctrl.prepareCodeCompilationPhase(mainWindow, ccService, ccConfig);
-        ctrl.setNextPhase(() -> { goToSolutionScoringPhase(ctrl, mainWindow); });
-        ctrl.showPreparedPhase();
+    public FileFetchingService getFFService() {
+        return ffService;
     }
 
-    private void goToSolutionScoringPhase(MainGUIController ctrl, Stage mainWindow) {
-        ctrl.prepareSolutionScoringPhase(mainWindow, ssService, ssConfig);
-        ctrl.setNextPhase(() -> { goToDuplicateDetectionPhase(ctrl, mainWindow); });
-        ctrl.showPreparedPhase();
+    public CodeCompilationService getCCService() {
+        return ccService;
     }
 
-    private void goToDuplicateDetectionPhase(MainGUIController ctrl, Stage mainWindow) {
-        ctrl.prepareDuplicateDetectionPhase(mainWindow, ddService, ddConfig);
-        ctrl.setNextPhase(() -> { goToEvaluationPhase(ctrl);});
-        ctrl.showPreparedPhase();
+    public SolutionScoringService getSSService() {
+        return ssService;
     }
 
-    private void goToEvaluationPhase(MainGUIController ctrl) {
-        ctrl.prepareEvaluationPhase();
-        ctrl.removeNextPhase();
-        ctrl.showPreparedPhase();
-
-        Task<Void> evalTask = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                evaluate();
-                return null;
-            }
-        };
-
-        evalTask.setOnSucceeded(e -> {
-            goToResultsPhase(ctrl);
-        });
-
-        Thread evalThread = new Thread(evalTask);
-        evalThread.start();
+    public DuplicateDetectionService getDDService() {
+        return ddService;
     }
 
-    private void goToResultsPhase(MainGUIController ctrl) {
-        ctrl.prepareResultsPhase(results, dupRatings);
-        ctrl.removeNextPhase();
-        ctrl.showPreparedPhase();
+
+    public FileFetchingConfiguration getFFConfig() {
+        return ffConfig;
     }
 
-    
-    private void evaluate() {
+    public CodeCompilationConfiguration getCCConfig() {
+        return ccConfig;
+    }
+
+    public SolutionScoringConfiguration getSSConfig() {
+        return ssConfig;
+    }
+
+    public DuplicateDetectionConfiguration getDDConfig() {
+        return ddConfig;
+    }
+
+
+    public Results getResults() {
+        return results;
+    }
+
+    public DuplicateRatings getDupRatings() {
+        return dupRatings;
+    }
+
+
+
+    public boolean evaluate() {
         System.out.println("EVALUATING.......");
         
         results = new Results();
         dupRatings = new DuplicateRatings();
         
-        // get students from FFM
-        List<String> students = ffService.getStudentsFromModule(ffConfig.getSelectedModuleIndex());
-        
-        // CCM initialization
-        ccService.runInitialization(ccConfig.getSelectedModuleIndex(), students);
-        
-        // TODO successful init check
-        
-        // list for gathering source paths for DDM
-        List<String> allStudentSourcePaths = new ArrayList<>();
-        
-        for (String student : students) {
-
-            // get target source location from CCM
-            String targetSourcePath = ccService.getSourceFileDirPath(ccConfig.getSelectedModuleIndex(), student);
-
-            // fetch source via FFM to target source location
-            ffService.runFetchForModule(ffConfig.getSelectedModuleIndex(), student, targetSourcePath);
-            
-            // save the source path for DDM
-            allStudentSourcePaths.add(targetSourcePath);
-            
+        List<String> allStudents = listStudents();
+        if (allStudents == null || allStudents.isEmpty()) {
+            listError();
+            return false;
         }
-        
-        // get all duplicate detection modules
-        List<Integer> ddModuleIndices = ddConfig.getSelectedModules();
-        
-        for (int ddIndex : ddModuleIndices) {
-            
-            // perform duplicate detection
-            ddService.runDuplicateDetection(ddIndex, students, allStudentSourcePaths);
 
-            for (String student : students) {
-                
+        StudentClassification students = new StudentClassification(allStudents);
+        
+        boolean initSuccess = performInitializations(students);
+        if (!initSuccess) {
+            initError(students);
+            return false;
+        }
+
+        Map<String, String> allStudentSourcePaths = fetchSource(students);
+
+        detectDuplicates(students, allStudentSourcePaths); // TODO successful vs unsuccessful modules
+        
+        performScoring(students, allStudentSourcePaths);
+
+        recordScores(students);
+
+
+        boolean cleanupSuccess = performCleanups(students);
+        if (!cleanupSuccess) {
+            cleanupError();
+        }
+
+        return true;
+    }
+
+
+    private class StudentClassification {
+        private List<String> okStudents = null;
+        private List<String> noSourceStudents = null;
+        private List<String> compilationFailedStudents = null;
+
+        private StudentClassification(List<String> students) {
+            okStudents = new ArrayList<String>(students);
+            noSourceStudents = new ArrayList<>();
+            compilationFailedStudents = new ArrayList<>();
+        }
+
+        public List<String> getCurrentOkStudents() {
+            return new ArrayList<>(okStudents);
+        }
+
+        public List<String> getCurrentNoSourceStudents() {
+            return new ArrayList<>(noSourceStudents);
+        }
+
+        public List<String> getCurrentCompilationFailedStudents() {
+            return new ArrayList<>(compilationFailedStudents);
+        }
+
+        public List<String> getAllStudents() {
+            List<String> ret = new ArrayList<>();
+            ret.addAll(okStudents);
+            ret.addAll(noSourceStudents);
+            ret.addAll(compilationFailedStudents);
+            return ret;
+        }
+
+        public List<String> getAllStudentsWithSource() {
+            List<String> ret = new ArrayList<>();
+            ret.addAll(okStudents);
+            ret.addAll(compilationFailedStudents);
+            return ret;
+        }
+
+        public void moveToNoSource(String student) {
+            if (okStudents.contains(student)) {
+                okStudents.remove(student);
+                noSourceStudents.add(student);
+            }
+        }
+
+        public void moveToCompilationFailed(String student) {
+            if (okStudents.contains(student)) {
+                okStudents.remove(student);
+                compilationFailedStudents.add(student);
+            }
+        }
+    }
+
+
+    private List<String> listStudents() {
+        List<String> students = ffService.getStudentsFromModule(ffConfig.getSelectedModuleIndex());
+        return students;
+    }
+
+    private void listError() {
+        Platform.runLater(() -> {
+            ErrorWindow ew = new ErrorWindow("No student solutions found.");
+            ew.setActionOnClose(() -> { mediator.showTitleScene(); });
+            mediator.showErrorWindow(ew);
+        });
+    }
+    
+
+    private boolean performInitializations(StudentClassification students) {
+        boolean initSuccess = ccService.runInitialization(ccConfig.getSelectedModuleIndex(), students.getAllStudents());
+        return initSuccess;
+    }
+
+    private void initError(StudentClassification students) {
+        Platform.runLater(() -> {
+            ErrorWindow ew = new ErrorWindow("Failed to initialize the compilation module.");
+            ew.setActionOnClose(() -> {
+                performCleanups(students);
+                mediator.showTitleScene();
+            });
+            mediator.showErrorWindow(ew);
+        });
+    }
+
+
+    private Map<String, String> fetchSource(StudentClassification students) {
+        List<String> studentList = students.getCurrentOkStudents();
+        Map<String, String> allSourcePaths = new HashMap<>();
+        for (String student : studentList) {
+            String targetSourcePath = ccService.getSourceFileDirPath(ccConfig.getSelectedModuleIndex(), student);
+            if (targetSourcePath == null) {
+                students.moveToNoSource(student);
+                continue;
+            }
+
+            boolean fetchSuccess = ffService.runFetchForModule(ffConfig.getSelectedModuleIndex(), student, targetSourcePath);
+            if (!fetchSuccess) {
+                students.moveToNoSource(student);
+                continue;
+            }
+
+            allSourcePaths.put(student, targetSourcePath);
+        }
+        return allSourcePaths;
+    }
+
+
+    private List<Integer> detectDuplicates(StudentClassification students, Map<String, String> allSourcePaths) {
+        List<String> studentList = students.getAllStudentsWithSource();
+
+        List<Integer> ddModuleIndices = ddConfig.getSelectedModules();
+        List<Integer> successfulModules = new ArrayList<>();
+        for (int ddIndex : ddModuleIndices) {
+
+            boolean dupDetectionSuccess = ddService.runDuplicateDetection(ddIndex, allSourcePaths);
+            if (!dupDetectionSuccess) {
+                continue;
+            }
+
+            for (String student : studentList) {
                 String moduleNo = Integer.toString(ddIndex); // TODO
                 
                 double dupRating = ddService.getStudentDuplicateRating(ddIndex, student);
                 Map<String, Double> pairwiseDupRatings = ddService.getStudentComparisonRatings(ddIndex, student);
                 
                 dupRatings.setStudentDuplicateRating(student, moduleNo, dupRating);
-                dupRatings.setStudentPairwiseDuplicateRatings(student, moduleNo, pairwiseDupRatings);
-
-            }
-        }
-        
-        // get all scoring modules
-        List<Integer> ssModuleIndices = ssConfig.getSelectedModules();
-                        
-        for (String student : students) {
-            
-            // get target source location from CCM
-            String targetSourcePath = ccService.getSourceFileDirPath(ccConfig.getSelectedModuleIndex(), student);
-            
-            for (int ssIndex : ssModuleIndices) {
-                
-                // score the solution source files
-                ssService.addScoreForSource(ssIndex, student, targetSourcePath);
-                
-            }
-            
-            // compile source via CCM
-            boolean compilationSuccess = ccService.runCompilation(ccConfig.getSelectedModuleIndex(), student);
-            
-            if (!compilationSuccess) {
-                System.out.println("Compilation for " + student + " failed.");
-                continue;
-            }
-            
-            for (int ssIndex : ssModuleIndices) {
-                
-                // get all tests
-                int numberOfInputs = ssService.numberOfInputs(ssIndex);
-
-                for (int inputNo = 1; inputNo <= numberOfInputs; inputNo++) {
-                
-                    System.out.println("Running case " + Integer.toString(inputNo));
-                    
-                    // get location to place input data in from CCM
-                    String targetInputPath = ccService.getInputDataDirPath(ccConfig.getSelectedModuleIndex(), student);
-
-                    // fetch input data via SSM
-                    ssService.fetchInput(ssIndex, inputNo, targetInputPath);
-
-                    // execute program via CCM
-                    ccService.runExecution(ccConfig.getSelectedModuleIndex(), student);
-
-                    // get location of execution output data from CCM
-                    String actualOutputPath = ccService.getOutputDataPath(ccConfig.getSelectedModuleIndex(), student);
-
-                    // score the solution output via SSM
-                    ssService.addScoreForOutput(ssIndex, student, inputNo, actualOutputPath);
-                
+                if (pairwiseDupRatings != null && !pairwiseDupRatings.isEmpty()) {
+                    dupRatings.setStudentPairwiseDuplicateRatings(student, moduleNo, pairwiseDupRatings);
                 }
-                
-                // record scores
-                String moduleNo = Integer.toString(ssIndex); // TODO actual name
-                double totalScore = ssService.getTotalModuleScore(ssIndex, student);
-                List<String> testNames = ssService.inputNames(ssIndex);
-                List<Double> testScores = ssService.getModuleScoresPerSegment(ssIndex, student);
-                
-                results.setStudentModuleScore(student, moduleNo, totalScore);
-                results.setStudentTestScores(student, moduleNo, testNames, testScores);
-                
-                // TODO remove
-                System.out.println("Score for student " + student + " from module " + moduleNo + ": " + Double.toString(totalScore));
-            
             }
-        
-            results.calculateTotalScore(student);
-        
-        }
-        
-        ccService.runCleanUp(ccConfig.getSelectedModuleIndex(), students);
 
+            successfulModules.add(ddIndex);
+        }
+        return successfulModules;
     }
-    
-    public class EvaluationResults {
-        public Map<String, Double> totalScorePerModule;
-        public Map<String, List<Double>> scorePerModuleTest;
-        
-        private EvaluationResults() {
-            totalScorePerModule = new HashMap<>();
-            scorePerModuleTest = new HashMap<>();
+
+
+    private void performScoring(StudentClassification students, Map<String, String> allSourcePaths) {
+        List<String> studentList = students.getCurrentOkStudents();
+        for (String student : studentList) {
+            scoreSource(student, allSourcePaths.get(student));
+            
+            boolean success = compileSource(student);
+
+            if (success) {
+                runAndScoreTests(student);
+            }
+            else {
+                students.moveToCompilationFailed(student);
+            }
         }
     }
+
+    private void scoreSource(String student, String targetSourcePath) {
+        List<Integer> ssModuleIndices = ssConfig.getSelectedModules();
+        for (int ssIndex : ssModuleIndices) {
+            ssService.addScoreForSource(ssIndex, student, targetSourcePath);
+        }
+    }
+
+    private boolean compileSource(String student) {
+        boolean compilationSuccess = ccService.runCompilation(ccConfig.getSelectedModuleIndex(), student);
+        return compilationSuccess;
+    }
+
+    private void runAndScoreTests(String student) {
+        List<Integer> ssModuleIndices = ssConfig.getSelectedModules();
+        for (int ssIndex : ssModuleIndices) {
+            List<String> inputs = ssService.getInputs(ssIndex);
+            for (String input : inputs) {
+                String targetInputPath = ccService.getInputDataDirPath(ccConfig.getSelectedModuleIndex(), student);
+                if (targetInputPath == null) {
+                    ssService.addScoreForFail(ssIndex, student, input);
+                    results.setStudentModuleTestFail(student, Integer.toString(ssIndex), input, "Input fetch failed.");
+                    continue;
+                }
+
+                boolean fetchSuccess = ssService.fetchInput(ssIndex, input, targetInputPath);
+                if (!fetchSuccess) {
+                    ssService.addScoreForFail(ssIndex, student, input);
+                    results.setStudentModuleTestFail(student, Integer.toString(ssIndex), input, "Input fetch failed.");
+                    continue;
+                }
+
+                boolean runSuccess = ccService.runExecution(ccConfig.getSelectedModuleIndex(), student);
+                if (!runSuccess) {
+                    ssService.addScoreForFail(ssIndex, student, input);
+                    results.setStudentModuleTestFail(student, Integer.toString(ssIndex), input, "Execution failed.");
+                    continue;
+                }
+
+                String actualOutputPath = ccService.getOutputDataPath(ccConfig.getSelectedModuleIndex(), student);
+                if (actualOutputPath == null) {
+                    ssService.addScoreForFail(ssIndex, student, input);
+                    results.setStudentModuleTestFail(student, Integer.toString(ssIndex), input, "Output reading failed.");
+                    continue;
+                }
+
+                ssService.addScoreForOutput(ssIndex, student, input, actualOutputPath);
+            }
+        }
+    }
+
+
+    private void recordScores(StudentClassification students) {
+        List<String> okStudents = students.getCurrentOkStudents();
+        for (String student : okStudents) {
+            recordStudentScores(student);
+        }
+
+        List<String> noSourceStudents = students.getCurrentNoSourceStudents();
+        for (String student : noSourceStudents) {
+            results.setStudentFail(student, "Source fetch failed.");
+        }
+        
+        List<String> compilationFailedStudents = students.getCurrentCompilationFailedStudents();
+        for (String student : compilationFailedStudents) {
+            results.setStudentFail(student, "Compilation failed.");
+        }
+    }
+
+    private void recordStudentScores(String student) {
+        List<Integer> ssModuleIndices = ssConfig.getSelectedModules();
+        
+        for (int ssIndex : ssModuleIndices) {
+            String moduleNo = Integer.toString(ssIndex); // TODO actual name
+            double totalScore = ssService.getTotalModuleScore(ssIndex, student);
+            Map<String, Double> testScores = ssService.getModuleScoresPerSegment(ssIndex, student);
+            
+            results.setStudentModuleScore(student, moduleNo, totalScore);
+            results.setStudentModuleTestScores(student, moduleNo, testScores);
+        }
+
+        results.calculateTotalScore(student);
+    }
+
+
+    private boolean performCleanups(StudentClassification students) {
+        boolean cleanupSuccess = ccService.runCleanUp(ccConfig.getSelectedModuleIndex(), students.getAllStudents());
+        return cleanupSuccess;
+    }
+
+    private void cleanupError() {
+        Platform.runLater(() -> {
+            ErrorWindow ew = new ErrorWindow("Module cleanups failed. Further actions may be needed to run evaluation successfully in the future.");
+            mediator.showErrorWindow(ew);
+        });
+    }
+
 }

@@ -9,8 +9,9 @@
     prefHeight="${resultsPane.parent.height}"
     styleClass="edge-to-edge"
 >
-    <VBox
+    <VBox fx:id="resultsBox"
         spacing="12.0"
+        prefWidth="${resultsBox.parent.width}"
     >
         <children>
             

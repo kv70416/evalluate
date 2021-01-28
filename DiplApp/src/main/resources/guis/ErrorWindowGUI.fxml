@@ -3,7 +3,11 @@
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.control.Button?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:id="errorPane">
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:id="errorPane"
+    style="
+        -fx-background-color: #A7F0D3;
+    "
+>
     <Text fx:id="errorText" />
     <Button text="OK" fx:id="okBtn" />
 </AnchorPane>

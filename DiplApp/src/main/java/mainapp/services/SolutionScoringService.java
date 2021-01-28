@@ -2,6 +2,7 @@ package mainapp.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.ServiceLoader;
 import mainapp.configurations.ModuleConfiguration;
 import mainapp.configurations.SolutionScoringConfiguration;
@@ -36,19 +37,14 @@ public class SolutionScoringService extends ModuleService<ISolutionScoringModule
         return !selectedModules.isEmpty();
     }
 
-    public int numberOfInputs(int index) {
-        if (badIndex(index)) return -1;
-        return instances.get(index).numberOfSegments();
-    }
-    
-    public List<String> inputNames(int index) {
+    public List<String> getInputs(int index) {
         if (badIndex(index)) return null;
-        return instances.get(index).segmentNames();
+        return instances.get(index).inputSegments();
     }
     
-    public boolean fetchInput(int index, int inputNumber, String targetInputPath) {
+    public boolean fetchInput(int index, String inputName, String targetInputPath) {
         if (badIndex(index)) return false;
-        return instances.get(index).fetchInputFile(inputNumber, targetInputPath);
+        return instances.get(index).fetchInputFile(inputName, targetInputPath);
     }
     
     public void addScoreForSource(int index, String student, String sourceFilePath) {
@@ -56,18 +52,25 @@ public class SolutionScoringService extends ModuleService<ISolutionScoringModule
         instances.get(index).addSourceScore(student, sourceFilePath);
     }
     
-    public void addScoreForOutput(int index, String student, int inputNumber, String actualOutputPath) {
+    public void addScoreForOutput(int index, String student, String inputName, String actualOutputPath) {
         if (badIndex(index)) return;
-        instances.get(index).addOutputScore(student, inputNumber, actualOutputPath);
+        instances.get(index).addOutputScore(student, inputName, actualOutputPath);
     }
+
+    public void addScoreForFail(int index, String student, String inputName) {
+        if (badIndex(index)) return;
+        instances.get(index).addFailScore(student, inputName);
+	}
+
     
     public double getTotalModuleScore(int index, String student) {
         if (badIndex(index)) return Double.NaN;
-        return instances.get(index).scoreSolution(student);
+        return instances.get(index).solutionScore(student);
     }
     
-    public List<Double> getModuleScoresPerSegment(int index, String student) {
+    public Map<String, Double> getModuleScoresPerSegment(int index, String student) {
         if (badIndex(index)) return null;
-        return instances.get(index).scorePerSegment(student);
+        return instances.get(index).segmentScores(student);
     }
+
 }

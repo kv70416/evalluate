@@ -1,4 +1,4 @@
-package mainapp;
+package mainapp.duplicateratings;
 
 import java.util.ArrayList;
 import java.util.List;

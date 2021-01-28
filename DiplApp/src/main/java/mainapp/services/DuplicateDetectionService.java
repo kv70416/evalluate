@@ -38,9 +38,9 @@ public class DuplicateDetectionService extends ModuleService<IDuplicateDetection
     }
     
     
-    public boolean runDuplicateDetection(int index, List<String> students, List<String> srcPaths) {
+    public boolean runDuplicateDetection(int index, Map<String, String> studentSrcPaths) {
         if (badIndex(index)) return false;
-        return instances.get(index).runDuplicateDetection(students, srcPaths);
+        return instances.get(index).runDuplicateDetection(studentSrcPaths);
     }
 
     public double getStudentDuplicateRating(int index, String student) {

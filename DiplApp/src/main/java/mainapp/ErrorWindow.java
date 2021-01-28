@@ -11,18 +11,19 @@ import mainapp.controllers.ErrorWindowGUIController;
 
 public class ErrorWindow {
     private String message = null;
+    private Stage errWindow = null;
 
     public ErrorWindow(String msg) {
         message = msg;
+        errWindow = new Stage();
+        errWindow.setWidth(400);
+        errWindow.setHeight(200);
+        errWindow.setTitle("Error");
     }
 
     public void showOverStage(Stage primaryStage) {
-        Stage errWindow = new Stage();
-        errWindow.setWidth(400);
-        errWindow.setHeight(300);
         errWindow.initModality(Modality.WINDOW_MODAL);
         errWindow.initOwner(primaryStage);
-        errWindow.setTitle("Error");
 
         FXMLLoader errLoader = new FXMLLoader();
         errLoader.setController(new ErrorWindowGUIController(message));
@@ -39,11 +40,6 @@ public class ErrorWindow {
     }
 
     public void showAlone() {
-        Stage errWindow = new Stage();
-        errWindow.setWidth(400);
-        errWindow.setHeight(300);
-        errWindow.setTitle("Error");
-
         FXMLLoader errLoader = new FXMLLoader();
         errLoader.setController(new ErrorWindowGUIController(message));
         errLoader.setLocation(getClass().getResource("/guis/ErrorWindowGUI.fxml"));
@@ -56,5 +52,9 @@ public class ErrorWindow {
             // TODO
             e.printStackTrace();
         }
+    }
+
+    public void setActionOnClose(Runnable r) {
+        errWindow.setOnHiding(ev -> { r.run(); });
     }
 }

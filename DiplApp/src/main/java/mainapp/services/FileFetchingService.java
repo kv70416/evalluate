@@ -15,9 +15,6 @@ public class FileFetchingService extends ModuleService<IFileFetchingModule> {
         ServiceLoader<IFileFetchingModuleFactory> ffLoader = ServiceLoader.load(IFileFetchingModuleFactory.class);
         for (IFileFetchingModuleFactory factory : ffLoader) {
             factories.add(factory);
-            
-            // TODO remove
-            System.out.println(factory.moduleName());
         }
         
         instances = new ArrayList<>();

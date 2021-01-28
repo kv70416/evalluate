@@ -1,15 +1,17 @@
 package mainapp.modules.interfaces;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ISolutionScoringModule extends IModule {
-    public int numberOfSegments();
-    public List<String> segmentNames();
+    public List<String> inputSegments();
     
-    public boolean fetchInputFile(int inputNumber, String inputFilePath);
+    public boolean fetchInputFile(String segmentName, String inputFilePath);
+
     public void addSourceScore(String student, String sourceFilePath);
-    public void addOutputScore(String student, int inputNumber, String actualOutputPath);
+    public void addOutputScore(String student, String segmentName, String actualOutputPath);
+    public void addFailScore(String student, String segmentName);
     
-    public double scoreSolution(String student);
-    public List<Double> scorePerSegment(String student);
+    public double solutionScore(String student);
+    public Map<String, Double> segmentScores(String student);
 }

@@ -1,27 +1,40 @@
 package mainapp.controllers;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import mainapp.DuplicateRatings;
-import mainapp.Results;
-import mainapp.DuplicateRatings.ModuleDupRating;
-import mainapp.DuplicateRatings.PairwiseDupRating;
-import mainapp.DuplicateRatings.StudentDupRating;
-import mainapp.Results.ModuleScore;
-import mainapp.Results.StudentScore;
+import mainapp.duplicateratings.DuplicateRatings;
+import mainapp.results.FailedStudentResult;
+import mainapp.results.FailedTestResult;
+import mainapp.results.Results;
+import mainapp.results.StudentResult;
+import mainapp.results.SuccessfulStudentResult;
+import mainapp.results.SuccessfulTestResult;
+import mainapp.results.TestResult;
+import mainapp.duplicateratings.DuplicateRatings.ModuleDupRating;
+import mainapp.duplicateratings.DuplicateRatings.PairwiseDupRating;
+import mainapp.duplicateratings.DuplicateRatings.StudentDupRating;
 
 public class ResultsGUIController {
     public VBox solutionScoresBox = null;
     public VBox duplicateRatingsBox = null;
 
     public void fill(Results results, DuplicateRatings ratings) {
-        for (StudentScore studentScore : results.getStudentScores()) {
+        Map<String, StudentResult> studentResults = results.getStudentResults();
+        List<String> students = new ArrayList<>(studentResults.keySet());
+        students.sort(null);
+        for (String student : students) {
             FXMLLoader scoreLoader = new FXMLLoader();
             scoreLoader.setController(new ResultsScoreGUIController());
             scoreLoader.setLocation(getClass().getResource("/guis/ResultsSolutionScoreGUI.fxml"));
@@ -30,18 +43,19 @@ public class ResultsGUIController {
                 VBox scoreBox = scoreLoader.<VBox>load();
 
                 ResultsScoreGUIController ctrl = scoreLoader.<ResultsScoreGUIController>getController();
-                ctrl.fill(studentScore);
+                ctrl.fill(student, studentResults.get(student));
 
                 solutionScoresBox.getChildren().add(scoreBox);
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 System.out.println(e.getMessage());
                 e.printStackTrace();
             }
 
         }
 
-        for (StudentDupRating studentRating : ratings.getStudentRatings()) {
+        List<StudentDupRating> studentRatings = ratings.getStudentRatings();
+        studentRatings.sort(Comparator.comparing(sr -> ((StudentDupRating) sr).getStudent()));
+        for (StudentDupRating studentRating : studentRatings) {
             FXMLLoader ratingLoader = new FXMLLoader();
             ratingLoader.setController(new ResultsRatingGUIController());
             ratingLoader.setLocation(getClass().getResource("/guis/ResultsDuplicateRatingGUI.fxml"));
@@ -53,14 +67,116 @@ public class ResultsGUIController {
                 ctrl.fill(studentRating);
 
                 duplicateRatingsBox.getChildren().add(ratingBox);
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 System.out.println(e.getMessage());
                 e.printStackTrace();
             }
         }
     }
 
+
+    // result scores //
+
+    public class ResultsScoreGUIController {
+        public Label studentLabel = null;
+        public VBox moduleScoresBox = null;
+
+        public void fill(String student, StudentResult result) {
+            studentLabel.setText("Student " + student + ":");
+
+            if (result instanceof SuccessfulStudentResult) {
+                Map<String, Double> moduleScores = ((SuccessfulStudentResult) result).getModuleScores();
+                List<String> modules = new ArrayList<>(moduleScores.keySet());
+                modules.sort(null);        
+                for (String module : modules) {
+                    FXMLLoader modScoreLoader = new FXMLLoader();
+                    modScoreLoader.setController(new ResultsModScoreGUIController());
+                    modScoreLoader.setLocation(getClass().getResource("/guis/ResultsModuleScoreGUI.fxml"));
+
+                    try {
+                        VBox modScoreBox = modScoreLoader.<VBox>load();
+
+                        ResultsModScoreGUIController ctrl = modScoreLoader.<ResultsModScoreGUIController>getController();
+                        ctrl.fill((SuccessfulStudentResult) result, module);
+
+                        moduleScoresBox.getChildren().add(modScoreBox);
+                    } catch (IOException e) {
+                        System.out.println(e.getMessage());
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+
+            if (result instanceof FailedStudentResult) {
+                Label msgLabel = new Label(((FailedStudentResult) result).getFailMessage());
+                moduleScoresBox.getChildren().add(msgLabel);
+            }
+        }
+    }
+
+    public class ResultsModScoreGUIController {
+        public Label moduleLabel = null;
+        public GridPane segmentPane = null;
+        public Button expandBtn = null;
+
+        public void fill(SuccessfulStudentResult result, String module) {
+            double moduleScore = result.getModuleScores().get(module);
+            moduleLabel.setText("Module " + module + ": " + Double.toString(moduleScore));
+
+            addGridRow(segmentPane, "Test", "Score", 0);
+            int pos = 1;
+            
+            Map<String, TestResult> testResults = result.getTestResults(module);
+            List<String> tests = new ArrayList<>(testResults.keySet());
+            tests.sort(null);        
+            for (String test : tests) {
+                TestResult testResult = testResults.get(test);
+
+                if (testResult instanceof SuccessfulTestResult) {
+                    double score = ((SuccessfulTestResult) testResult).getScore();
+                    addGridRow(segmentPane, test, Double.toString(score), pos);
+                }
+
+                if (testResult instanceof FailedTestResult) {
+                    String msg = ((FailedTestResult) testResult).getFailMessage();
+                    addGridRow(segmentPane, test, msg, pos);
+                }
+
+                pos++;
+            }
+        }
+
+        private void addGridRow(GridPane pane, String leftVal, String rightVal, int pos) {
+            VBox leftBox = new VBox(new Text(leftVal));
+            VBox rightBox = new VBox(new Text(rightVal));
+            if (pos == 0) {
+                leftBox.setStyle("-fx-border-style: solid; -fx-border-color: #105B3D; -fx-border-width: 0 1 2 0");
+                rightBox.setStyle("-fx-border-style: solid; -fx-border-color: #105B3D; -fx-border-width: 0 0 2 1");
+            }
+            else {
+                leftBox.setStyle("-fx-border-style: solid; -fx-border-color: #105B3D; -fx-border-width: 0 1 0 0");
+                rightBox.setStyle("-fx-border-style: solid; -fx-border-color: #105B3D; -fx-border-width: 0 0 0 1");
+            }
+
+            leftBox.setPadding(new Insets(2., 2., 2., 2.));
+            rightBox.setPadding(new Insets(2., 2., 2., 2.));
+
+            segmentPane.add(leftBox, 0, pos, 1, 1);
+            segmentPane.add(rightBox, 1, pos, 1, 1);
+        }
+
+        @FXML
+        public void expandSegmentPane() {
+            segmentPane.setVisible(!segmentPane.isVisible());
+            segmentPane.setManaged(segmentPane.isVisible());
+            expandBtn.setText(segmentPane.isVisible() ? "Collapse" : "Expand");
+        }
+    
+    }
+
+
+    // duplicate ratings //
 
     public class ResultsRatingGUIController {
         public Label studentLabel = null;
@@ -69,7 +185,9 @@ public class ResultsGUIController {
         public void fill(StudentDupRating studentRating) {
             studentLabel.setText("Student " + studentRating.getStudent() + ":");
 
-            for (ModuleDupRating moduleRating : studentRating.getModuleRatings()) {
+            List<ModuleDupRating> moduleRatings = studentRating.getModuleRatings();
+            moduleRatings.sort(Comparator.comparing(r -> ((ModuleDupRating) r).getModuleName()));
+            for (ModuleDupRating moduleRating : moduleRatings) {
                 FXMLLoader modRatingLoader = new FXMLLoader();
                 modRatingLoader.setController(new ResultsModRatingGUIController());
                 modRatingLoader.setLocation(getClass().getResource("/guis/ResultsModuleRatingGUI.fxml"));
@@ -81,8 +199,7 @@ public class ResultsGUIController {
                     ctrl.fill(moduleRating);
 
                     moduleRatingsBox.getChildren().add(modRatingBox);
-                }
-                catch (IOException e) {
+                } catch (IOException e) {
                     System.out.println(e.getMessage());
                     e.printStackTrace();
                 }
@@ -94,90 +211,53 @@ public class ResultsGUIController {
     public class ResultsModRatingGUIController {
         public Label moduleLabel = null;
         public GridPane comparisonList = null;
+        public Button expandBtn = null;
 
         public void fill(ModuleDupRating moduleRating) {
-            moduleLabel.setText("Module " + moduleRating.getModuleName() + ": " + String.format("%.2f", moduleRating.getTotalRating()));
+            moduleLabel.setText("Module " + moduleRating.getModuleName() + ": "
+                    + String.format("%.2f", moduleRating.getTotalRating()));
 
-            int pos = 0;
-            for (PairwiseDupRating pairwiseRating : moduleRating.getPairwiseRatings()) {
+            addGridRow(comparisonList, "Student", "Rating", 0);
+
+            int pos = 1;
+            List<PairwiseDupRating> pairwiseDupRatings = moduleRating.getPairwiseRatings();
+            pairwiseDupRatings.sort(Comparator.comparingDouble(pr -> ((PairwiseDupRating) pr).getComparisonRating()).reversed());
+            for (PairwiseDupRating pairwiseRating : pairwiseDupRatings) {
                 String compStudent = pairwiseRating.getComparisonStudent();
                 double compRating = pairwiseRating.getComparisonRating();
 
-                VBox ratingPane = new VBox(new Text(String.format("%.2f", compRating)));
-                VBox studentPane = new VBox(new Text(compStudent));
-
-                ratingPane.setStyle("-fx-border-style: solid; -fx-border-color: #105B3D; -fx-border-width: 1");
-                studentPane.setStyle("-fx-border-style: solid; -fx-border-color: #105B3D; -fx-border-width: 1");
-                
-                ratingPane.setPadding(new Insets(2., 2., 2., 2.));
-                studentPane.setPadding(new Insets(2., 2., 2., 2.));
-
-                comparisonList.add(ratingPane, 0, pos, 1, 1);
-                comparisonList.add(studentPane, 1, pos, 1, 1);
+                addGridRow(comparisonList, compStudent, String.format("%.2f", compRating), pos);
 
                 pos++;
             }
         }
-    }
 
-
-    public class ResultsScoreGUIController {
-        public Label studentLabel = null;
-        public VBox moduleScoresBox = null;
-
-        public void fill(StudentScore studentScore) {
-            studentLabel.setText("Student " + studentScore.getStudent() + ":");
-
-            for (ModuleScore moduleScore : studentScore.getModuleScores()) {
-                FXMLLoader modScoreLoader = new FXMLLoader();
-                modScoreLoader.setController(new ResultsModScoreGUIController());
-                modScoreLoader.setLocation(getClass().getResource("/guis/ResultsModuleScoreGUI.fxml"));
-    
-                try {
-                    VBox modScoreBox = modScoreLoader.<VBox>load();
-    
-                    ResultsModScoreGUIController ctrl = modScoreLoader.<ResultsModScoreGUIController>getController();
-                    ctrl.fill(moduleScore);
-    
-                    moduleScoresBox.getChildren().add(modScoreBox);
-                } catch (IOException e) {
-                    System.out.println(e.getMessage());
-                    e.printStackTrace();
-                }
-    
+        private void addGridRow(GridPane pane, String leftVal, String rightVal, int pos) {
+            VBox leftBox = new VBox(new Text(leftVal));
+            VBox rightBox = new VBox(new Text(rightVal));
+            if (pos == 0) {
+                leftBox.setStyle("-fx-border-style: solid; -fx-border-color: #105B3D; -fx-border-width: 0 1 2 0");
+                rightBox.setStyle("-fx-border-style: solid; -fx-border-color: #105B3D; -fx-border-width: 0 0 2 1");
             }
-        }
-    }
-
-    public class ResultsModScoreGUIController {
-        public Label moduleLabel = null;
-        public GridPane segmentPane = null;
-
-        public void fill(ModuleScore moduleScore) {
-            moduleLabel.setText("Module " + moduleScore.getModuleName() + ": " + Double.toString(moduleScore.getModuleScore()));
-
-            int pos = 0;
-            for (Results.TestScore testScore : moduleScore.getTestScores()) {
-                String test = testScore.getTestName();
-                double score = testScore.getTestScore();
-
-                VBox testPane = new VBox(new Text(test));
-                VBox scorePane = new VBox(new Text(Double.toString(score)));
-
-                testPane.setStyle("-fx-border-style: solid; -fx-border-color: #105B3D; -fx-border-width: 1");
-                scorePane.setStyle("-fx-border-style: solid; -fx-border-color: #105B3D; -fx-border-width: 1");
-                
-                testPane.setPadding(new Insets(2., 2., 2., 2.));
-                scorePane.setPadding(new Insets(2., 2., 2., 2.));
-
-                segmentPane.add(testPane, pos, 0, 1, 1);
-                segmentPane.add(scorePane, pos, 1, 1, 1);
-
-                pos++;
+            else {
+                leftBox.setStyle("-fx-border-style: solid; -fx-border-color: #105B3D; -fx-border-width: 0 1 0 0");
+                rightBox.setStyle("-fx-border-style: solid; -fx-border-color: #105B3D; -fx-border-width: 0 0 0 1");
             }
+
+            leftBox.setPadding(new Insets(2., 2., 2., 2.));
+            rightBox.setPadding(new Insets(2., 2., 2., 2.));
+
+            pane.add(leftBox, 0, pos, 1, 1);
+            pane.add(rightBox, 1, pos, 1, 1);
         }
+
+        @FXML
+        public void expandComparisonList() {
+            comparisonList.setVisible(!comparisonList.isVisible());
+            comparisonList.setManaged(comparisonList.isVisible());
+            expandBtn.setText(comparisonList.isVisible() ? "Collapse" : "Expand");
+        }
+
     }
-
-
 
 }

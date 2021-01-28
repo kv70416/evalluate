@@ -1,21 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.geometry.Insets?>
 
 <VBox xmlns:fx="http://javafx.com/fxml" 
     spacing="4.0"
+    fillWidth="true"
+    style="
+        -fx-border-style: solid;
+        -fx-border-width: 0 0 2 0;
+        -fx-border-color: #105B3D;
+    "
 >
     <children>
         
-        <Label text="" fx:id="moduleLabel"
-        />
+        <HBox
+            alignment="CENTER_LEFT"
+        >
+            <Label text="" fx:id="moduleLabel"
+                HBox.hgrow="ALWAYS"
+                maxWidth="+Infinity"
+            />
+            <Button text="Expand" fx:id="expandBtn" onAction="#expandSegmentPane" />
+        </HBox>
 
-        <GridPane fx:id="segmentPane" 
+        <GridPane fx:id="segmentPane"
+            visible="false"
+            managed="false"
             hgap="0.0"
             vgap="0.0"
-        />
+        >
+            <columnConstraints>
+                <ColumnConstraints hgrow="ALWAYS" />
+                <ColumnConstraints hgrow="ALWAYS" />
+            </columnConstraints>
+        </GridPane>
         
     </children>
 </VBox>

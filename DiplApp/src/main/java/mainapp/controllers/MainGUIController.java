@@ -10,12 +10,12 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import mainapp.DuplicateRatings;
-import mainapp.Results;
+import mainapp.duplicateratings.DuplicateRatings;
 import mainapp.configurations.CodeCompilationConfiguration;
 import mainapp.configurations.DuplicateDetectionConfiguration;
 import mainapp.configurations.FileFetchingConfiguration;
 import mainapp.configurations.SolutionScoringConfiguration;
+import mainapp.results.Results;
 import mainapp.services.CodeCompilationService;
 import mainapp.services.DuplicateDetectionService;
 import mainapp.services.FileFetchingService;
@@ -115,7 +115,7 @@ public class MainGUIController {
         };
         
         FXMLLoader ddLoader = new FXMLLoader();
-        ddLoader.setController(new DuplicateDetectionGUIController(service, config)); // TODO edit constructor
+        ddLoader.setController(new DuplicateDetectionGUIController(service, config));
         ddLoader.setLocation(getClass().getResource("/guis/DuplicateDetectionGUI.fxml"));
         
         try {
