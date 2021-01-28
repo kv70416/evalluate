@@ -16,9 +16,6 @@ public class CodeCompilationConfiguration extends ModuleConfiguration {
         selectedModuleIndex = service.createModuleInstance(moduleID);
         
         selectedModuleID = moduleID;
-        
-        // TODO remove
-        System.out.println("Mod index: " + selectedModuleIndex);
     }
     
     public int getSelectedModuleIndex() {
