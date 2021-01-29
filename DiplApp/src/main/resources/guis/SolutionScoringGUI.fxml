@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Text?>
 <?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TabPane?>
@@ -70,7 +72,26 @@
             "
         />
         
-        <!-- TODO combo submenu -->
+        <HBox fx:id="comboBox"
+            visible="false"
+            managed="false"
+            alignment="CENTER_LEFT"
+            spacing="8.0"
+        >
+            <Text
+                text="Choose the method of combining the results for a total score:"
+            />
+            <MenuButton fx:id="comboMenu"
+                text="Choose a method..."
+            >
+                <items>
+                    <MenuItem text="Sum" onAction="#setSumAggregation" />
+                    <MenuItem text="Minimum" onAction="#setMinAggregation" />
+                    <MenuItem text="Maximum" onAction="#setMaxAggregation" />
+                    <MenuItem text="Average" onAction="#setAvgAggregation" />
+                </items>
+            </MenuButton>
+        </HBox>
         
     </children>
 </VBox>

@@ -82,9 +82,9 @@ public class ResultsGUIController {
         public VBox moduleScoresBox = null;
 
         public void fill(String student, StudentResult result) {
-            studentLabel.setText("Student " + student + ":");
-
             if (result instanceof SuccessfulStudentResult) {
+                studentLabel.setText("Student " + student + ": " + ((SuccessfulStudentResult) result).getTotalScore());
+
                 Map<String, Double> moduleScores = ((SuccessfulStudentResult) result).getModuleScores();
                 List<String> modules = new ArrayList<>(moduleScores.keySet());
                 modules.sort(null);        
@@ -109,6 +109,8 @@ public class ResultsGUIController {
             }
 
             if (result instanceof FailedStudentResult) {
+                studentLabel.setText("Student " + student + ": ");
+
                 Label msgLabel = new Label(((FailedStudentResult) result).getFailMessage());
                 moduleScoresBox.getChildren().add(msgLabel);
             }

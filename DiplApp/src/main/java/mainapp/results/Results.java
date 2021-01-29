@@ -18,12 +18,12 @@ public class Results {
     }
 
 
-    public void calculateTotalScore(String student) {
+    public void calculateTotalScore(String student, AggregationType type) {
         StudentResult res = studentResults.get(student);
         if (res == null || res instanceof FailedStudentResult) {
             return;
         }
-        ((SuccessfulStudentResult) res).calculateTotalScore();
+        ((SuccessfulStudentResult) res).calculateTotalScore(type);
     }
 
     public void setStudentModuleScore(String student, String module, double score) {

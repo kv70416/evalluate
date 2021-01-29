@@ -364,7 +364,7 @@ public class Evaluator {
             results.setStudentModuleTestScores(student, moduleNo, testScores);
         }
 
-        results.calculateTotalScore(student);
+        results.calculateTotalScore(student, ssConfig.getAggregationType());
     }
 
 

@@ -2,11 +2,15 @@ package mainapp.configurations;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import mainapp.results.AggregationType;
 import mainapp.services.SolutionScoringService;
 
 public class SolutionScoringConfiguration extends ModuleConfiguration {
     
     private List<Integer> selectedModuleIndices = new ArrayList<>();
+
+    private AggregationType aggregationType = null;
     
     public int addModule(SolutionScoringService service, String moduleID) {
         int index = service.createModuleInstance(moduleID);
@@ -21,5 +25,13 @@ public class SolutionScoringConfiguration extends ModuleConfiguration {
     
     public List<Integer> getSelectedModules() {
         return selectedModuleIndices;
+    }
+
+    public void setAggregationType(AggregationType aggregationType) {
+        this.aggregationType = aggregationType;
+    }
+
+    public AggregationType getAggregationType() {
+        return aggregationType;
     }
 }

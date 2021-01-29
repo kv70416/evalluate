@@ -1,15 +1,20 @@
 package mainapp.controllers;
 
 import java.util.List;
+
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import mainapp.configurations.SolutionScoringConfiguration;
 import mainapp.modules.interfaces.ISolutionScoringModule;
+import mainapp.results.AggregationType;
 import mainapp.services.ModuleService;
 import mainapp.services.SolutionScoringService;
 
@@ -19,6 +24,8 @@ public class SolutionScoringGUIController extends ModuleGUIController {
     public Label ssModuleDescription = null;
     public Label ssModuleID = null;
     public TabPane ssSubmenuTabs = null;
+    public HBox comboBox = null;
+    public MenuButton comboMenu = null;
     
     private SolutionScoringService ssService = null;
     private SolutionScoringConfiguration ssConfig = null;
@@ -45,9 +52,14 @@ public class SolutionScoringGUIController extends ModuleGUIController {
             newTab.setOnClosed(evt -> {
                 Object data = newTab.getUserData();
                 ssConfig.removeModule(ssService, (int)data);
+
+                setComboVisibility(ssConfig.getSelectedModules().size() > 1);
+
                 configRefresh.run();
             });
             ssSubmenuTabs.getTabs().add(newTab);
+
+            setComboVisibility(ssConfig.getSelectedModules().size() > 1);
             
             configRefresh.run();
         });
@@ -70,6 +82,35 @@ public class SolutionScoringGUIController extends ModuleGUIController {
             }
         }
         return true;
+    }
+
+    private void setComboVisibility(boolean visible) {
+        comboBox.setVisible(visible);
+        comboBox.setManaged(visible);
+    }
+
+    @FXML
+    public void setSumAggregation(ActionEvent e) {
+        ssConfig.setAggregationType(AggregationType.SUM);
+        comboMenu.setText(((MenuItem)e.getSource()).getText());
+    }
+    
+    @FXML
+    public void setMinAggregation(ActionEvent e) {
+        ssConfig.setAggregationType(AggregationType.MIN);
+        comboMenu.setText(((MenuItem)e.getSource()).getText());
+    }
+    
+    @FXML
+    public void setMaxAggregation(ActionEvent e) {
+        ssConfig.setAggregationType(AggregationType.MAX);
+        comboMenu.setText(((MenuItem)e.getSource()).getText());
+    }
+    
+    @FXML
+    public void setAvgAggregation(ActionEvent e) {
+        ssConfig.setAggregationType(AggregationType.AVG);
+        comboMenu.setText(((MenuItem)e.getSource()).getText());
     }
     
 }
