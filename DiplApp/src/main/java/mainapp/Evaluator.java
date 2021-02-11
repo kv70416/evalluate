@@ -3,8 +3,8 @@ package mainapp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import mainapp.configurations.SolutionScoringConfiguration;
-import mainapp.duplicateratings.DuplicateRatings;
-import mainapp.results.Results;
+import mainapp.results.ratings.DuplicateRatings;
+import mainapp.results.scores.Results;
 import mainapp.configurations.FileFetchingConfiguration;
 import mainapp.configurations.CodeCompilationConfiguration;
 import java.util.List;
@@ -256,10 +256,11 @@ public class Evaluator {
                 double dupRating = ddService.getStudentDuplicateRating(ddIndex, student);
                 Map<String, Double> pairwiseDupRatings = ddService.getStudentComparisonRatings(ddIndex, student);
                 
-                dupRatings.setStudentDuplicateRating(student, moduleNo, dupRating);
+                dupRatings.setStudentModuleRating(student, moduleNo, dupRating);
                 if (pairwiseDupRatings != null && !pairwiseDupRatings.isEmpty()) {
-                    dupRatings.setStudentPairwiseDuplicateRatings(student, moduleNo, pairwiseDupRatings);
+                    dupRatings.setModuleComparisonRating(student, moduleNo, pairwiseDupRatings);
                 }
+                dupRatings.calculateTotalRating(student, ddConfig.getAggregationType());
             }
 
             successfulModules.add(ddIndex);

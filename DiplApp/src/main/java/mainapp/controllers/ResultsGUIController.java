@@ -15,17 +15,16 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import mainapp.duplicateratings.DuplicateRatings;
-import mainapp.results.FailedStudentResult;
-import mainapp.results.FailedTestResult;
-import mainapp.results.Results;
-import mainapp.results.StudentResult;
-import mainapp.results.SuccessfulStudentResult;
-import mainapp.results.SuccessfulTestResult;
-import mainapp.results.TestResult;
-import mainapp.duplicateratings.DuplicateRatings.ModuleDupRating;
-import mainapp.duplicateratings.DuplicateRatings.PairwiseDupRating;
-import mainapp.duplicateratings.DuplicateRatings.StudentDupRating;
+import mainapp.results.ratings.DuplicateRatings;
+import mainapp.results.ratings.PairwiseRating;
+import mainapp.results.ratings.StudentRating;
+import mainapp.results.scores.FailedStudentResult;
+import mainapp.results.scores.FailedTestResult;
+import mainapp.results.scores.Results;
+import mainapp.results.scores.StudentResult;
+import mainapp.results.scores.SuccessfulStudentResult;
+import mainapp.results.scores.SuccessfulTestResult;
+import mainapp.results.scores.TestResult;
 
 public class ResultsGUIController {
     public VBox solutionScoresBox = null;
@@ -54,9 +53,10 @@ public class ResultsGUIController {
 
         }
 
-        List<StudentDupRating> studentRatings = ratings.getStudentRatings();
-        studentRatings.sort(Comparator.comparing(sr -> ((StudentDupRating) sr).getStudent()));
-        for (StudentDupRating studentRating : studentRatings) {
+        Map<String, StudentRating> studentRatings = ratings.getStudentRatings();
+        students = new ArrayList<>(studentRatings.keySet());
+        students.sort(null);
+        for (String student : students) {
             FXMLLoader ratingLoader = new FXMLLoader();
             ratingLoader.setController(new ResultsRatingGUIController());
             ratingLoader.setLocation(getClass().getResource("/guis/ResultsDuplicateRatingGUI.fxml"));
@@ -65,7 +65,7 @@ public class ResultsGUIController {
                 VBox ratingBox = ratingLoader.<VBox>load();
 
                 ResultsRatingGUIController ctrl = ratingLoader.<ResultsRatingGUIController>getController();
-                ctrl.fill(studentRating);
+                ctrl.fill(student, studentRatings.get(student));
 
                 duplicateRatingsBox.getChildren().add(ratingBox);
             } catch (IOException e) {
@@ -186,12 +186,13 @@ public class ResultsGUIController {
         public Label studentLabel = null;
         public VBox moduleRatingsBox = null;
 
-        public void fill(StudentDupRating studentRating) {
-            studentLabel.setText("Student " + studentRating.getStudent() + ": " + String.format("%.2f", studentRating.getModuleRatings().get(0).getTotalRating()));
+        public void fill(String student, StudentRating studentRating) {
+            studentLabel.setText("Student " + student + ": " + String.format("%.2f", studentRating.getTotalRating()));
 
-            List<ModuleDupRating> moduleRatings = studentRating.getModuleRatings();
-            moduleRatings.sort(Comparator.comparing(r -> ((ModuleDupRating) r).getModuleName()));
-            for (ModuleDupRating moduleRating : moduleRatings) {
+
+            List<String> modules = new ArrayList<>(studentRating.getModuleRatings().keySet());
+            modules.sort(null);
+            for (String module : modules) {
                 FXMLLoader modRatingLoader = new FXMLLoader();
                 modRatingLoader.setController(new ResultsModRatingGUIController());
                 modRatingLoader.setLocation(getClass().getResource("/guis/ResultsModuleRatingGUI.fxml"));
@@ -200,7 +201,7 @@ public class ResultsGUIController {
                     VBox modRatingBox = modRatingLoader.<VBox>load();
 
                     ResultsModRatingGUIController ctrl = modRatingLoader.<ResultsModRatingGUIController>getController();
-                    ctrl.fill(moduleRating);
+                    ctrl.fill(module, studentRating);
 
                     moduleRatingsBox.getChildren().add(modRatingBox);
                 } catch (IOException e) {
@@ -217,16 +218,16 @@ public class ResultsGUIController {
         public GridPane comparisonList = null;
         public Button expandBtn = null;
 
-        public void fill(ModuleDupRating moduleRating) {
-            moduleLabel.setText("Module #" + (Integer.parseInt(moduleRating.getModuleName()) + 1) + ": "
-                    + String.format("%.2f", moduleRating.getTotalRating()));
+        public void fill(String module, StudentRating studentRating) {
+            moduleLabel.setText("Module #" + (Integer.parseInt(module) + 1) + ": "
+                    + String.format("%.2f", studentRating.getModuleRatings().get(module)));
 
             addGridRow(comparisonList, "Student", "Rating", 0);
 
             int pos = 1;
-            List<PairwiseDupRating> pairwiseDupRatings = moduleRating.getPairwiseRatings();
-            pairwiseDupRatings.sort(Comparator.comparingDouble(pr -> ((PairwiseDupRating) pr).getComparisonRating()).reversed());
-            for (PairwiseDupRating pairwiseRating : pairwiseDupRatings) {
+            List<PairwiseRating> pairwiseDupRatings = studentRating.getPairwiseRatings().get(module);
+            pairwiseDupRatings.sort(Comparator.comparingDouble(pr -> ((PairwiseRating) pr).getComparisonRating()).reversed());
+            for (PairwiseRating pairwiseRating : pairwiseDupRatings) {
                 String compStudent = pairwiseRating.getComparisonStudent();
                 double compRating = pairwiseRating.getComparisonRating();
 

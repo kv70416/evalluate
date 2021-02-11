@@ -1,8 +1,11 @@
-package mainapp.results;
+package mainapp.results.scores;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import mainapp.results.Aggregation;
+import mainapp.results.AggregationType;
 
 public class SuccessfulStudentResult extends StudentResult {
     private double totalScore = Double.NaN;

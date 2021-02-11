@@ -1,4 +1,4 @@
-package mainapp.results;
+package mainapp.results.scores;
 
 public class FailedTestResult extends TestResult {
     private String failMessage = null;

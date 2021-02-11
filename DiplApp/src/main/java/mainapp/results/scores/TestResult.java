@@ -1,4 +1,4 @@
-package mainapp.results;
+package mainapp.results.scores;
 
 public abstract class TestResult {
 }

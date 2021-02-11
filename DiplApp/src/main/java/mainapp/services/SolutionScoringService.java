@@ -34,6 +34,9 @@ public class SolutionScoringService extends ModuleService<ISolutionScoringModule
                 return false;
             }
         }
+        if (selectedModules.size() > 1) {
+            return ssConfig.getAggregationType() != null;
+        }
         return !selectedModules.isEmpty();
     }
 

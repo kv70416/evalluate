@@ -34,6 +34,9 @@ public class DuplicateDetectionService extends ModuleService<IDuplicateDetection
                 return false;
             }
         }
+        if (selectedModules.size() > 1) {
+            return ddConfig.getAggregationType() != null;
+        }
         return !selectedModules.isEmpty();
     }
     

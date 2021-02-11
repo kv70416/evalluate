@@ -1,4 +1,4 @@
-package mainapp.results;
+package mainapp.results.scores;
 
 public class SuccessfulTestResult extends TestResult {
     private double score = Double.NaN;

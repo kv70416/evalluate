@@ -1,7 +1,9 @@
-package mainapp.results;
+package mainapp.results.scores;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import mainapp.results.AggregationType;
 
 public class Results {
     
