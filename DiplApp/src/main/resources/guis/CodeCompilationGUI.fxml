@@ -18,6 +18,7 @@
             style="
                 -fx-font-size: 16;
                 -fx-font-weight: bold;
+                -fx-text-fill: black;
             "
         />
         

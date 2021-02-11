@@ -17,9 +17,12 @@
     </padding>
     <children>
         <Text fx:id="miniTitleText"
-            text="Aplikacija"
+            text="EvAlluate"
             style="
-                -fx-font-size: 20;
+                    -fx-font-size: 20;
+                    -fx-font-weight: bold;
+                    -fx-font-style: italic;
+                    -fx-font-family: serif;
             "
         />
         <Pane fx:id="phasePane"
@@ -29,9 +32,27 @@
                 <Insets top="20.0" bottom="20.0" />
             </VBox.margin>
         </Pane>
-        <HBox fx:id="buttonBox">
+        <HBox fx:id="buttonBox"
+            alignment="CENTER_RIGHT"
+            spacing="8.0"
+        >
             <children>
-                <Button fx:id="nextBtn" text="Continue" disable="true" />
+                <Button text="Export configuration..."
+                    visible="false"
+                    managed="false"
+                />
+                <Button text="Export results..."
+                    visible="false"
+                    managed="false"
+                />
+                <HBox
+                    HBox.hgrow="ALWAYS"
+                    alignment="CENTER_RIGHT"
+                    spacing="8.0"
+                >
+                    <Button fx:id="backBtn" text="Back" disable="true" />
+                    <Button fx:id="nextBtn" text="Continue" disable="true" />
+                </HBox>
             </children>
         </HBox>
     </children>

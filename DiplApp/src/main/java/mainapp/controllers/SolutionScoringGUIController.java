@@ -45,7 +45,7 @@ public class SolutionScoringGUIController extends ModuleGUIController {
         ssModuleConfirmBtn.setOnAction(ev -> {
             int index = ssConfig.addModule(ssService, this.viewedModuleID);
             
-            Tab newTab = new Tab(Integer.toString(index));
+            Tab newTab = new Tab("Module #" + Integer.toString(index + 1));
             newTab.setClosable(true);
             newTab.setContent(ssService.getModuleGUI(index, mainWindow, configRefresh));
             newTab.setUserData(index);

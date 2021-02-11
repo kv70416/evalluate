@@ -38,7 +38,7 @@ public class DuplicateDetectionGUIController extends ModuleGUIController {
         ddModuleConfirmBtn.setOnAction(ev -> {
             int index = ddConfig.addModule(ddService, this.viewedModuleID);
             
-            Tab newTab = new Tab(Integer.toString(index));
+            Tab newTab = new Tab("Module #" + Integer.toString(index + 1));
             newTab.setClosable(true);
             newTab.setContent(ddService.getModuleGUI(index, mainWindow, configRefresh));
             newTab.setUserData(index);

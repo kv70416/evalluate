@@ -11,6 +11,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -112,6 +113,7 @@ public class ResultsGUIController {
                 studentLabel.setText("Student " + student + ": ");
 
                 Label msgLabel = new Label(((FailedStudentResult) result).getFailMessage());
+                msgLabel.setStyle("-fx-font-weight: bolder;");
                 moduleScoresBox.getChildren().add(msgLabel);
             }
         }
@@ -124,7 +126,7 @@ public class ResultsGUIController {
 
         public void fill(SuccessfulStudentResult result, String module) {
             double moduleScore = result.getModuleScores().get(module);
-            moduleLabel.setText("Module " + module + ": " + Double.toString(moduleScore));
+            moduleLabel.setText("Module #" + (Integer.parseInt(module) + 1) + ": " + Double.toString(moduleScore));
 
             addGridRow(segmentPane, "Test", "Score", 0);
             int pos = 1;
@@ -164,8 +166,8 @@ public class ResultsGUIController {
             leftBox.setPadding(new Insets(2., 2., 2., 2.));
             rightBox.setPadding(new Insets(2., 2., 2., 2.));
 
-            segmentPane.add(leftBox, 0, pos, 1, 1);
-            segmentPane.add(rightBox, 1, pos, 1, 1);
+            pane.add(leftBox, 0, pos, 1, 1);
+            pane.add(rightBox, 1, pos, 1, 1);
         }
 
         @FXML
@@ -185,7 +187,7 @@ public class ResultsGUIController {
         public VBox moduleRatingsBox = null;
 
         public void fill(StudentDupRating studentRating) {
-            studentLabel.setText("Student " + studentRating.getStudent() + ":");
+            studentLabel.setText("Student " + studentRating.getStudent() + ": " + String.format("%.2f", studentRating.getModuleRatings().get(0).getTotalRating()));
 
             List<ModuleDupRating> moduleRatings = studentRating.getModuleRatings();
             moduleRatings.sort(Comparator.comparing(r -> ((ModuleDupRating) r).getModuleName()));
@@ -216,7 +218,7 @@ public class ResultsGUIController {
         public Button expandBtn = null;
 
         public void fill(ModuleDupRating moduleRating) {
-            moduleLabel.setText("Module " + moduleRating.getModuleName() + ": "
+            moduleLabel.setText("Module #" + (Integer.parseInt(moduleRating.getModuleName()) + 1) + ": "
                     + String.format("%.2f", moduleRating.getTotalRating()));
 
             addGridRow(comparisonList, "Student", "Rating", 0);
