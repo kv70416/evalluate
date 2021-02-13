@@ -7,7 +7,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Pane;
-import javafx.stage.Stage;
+import mainapp.PhaseMediator;
 import mainapp.configurations.CodeCompilationConfiguration;
 import mainapp.modules.interfaces.ICodeCompilationModule;
 import mainapp.services.CodeCompilationService;
@@ -20,29 +20,28 @@ public class CodeCompilationGUIController extends ModuleGUIController {
     public Label ccModuleID = null;
     public Pane ccSubmenuPane = null;
 
+    private PhaseMediator mediator = null;
     private CodeCompilationService ccService = null;
     private CodeCompilationConfiguration ccConfig = null;
 
     private String viewedModuleID = null;
     
-    public CodeCompilationGUIController(CodeCompilationService service, CodeCompilationConfiguration config) {
+    public CodeCompilationGUIController(PhaseMediator med, CodeCompilationService service, CodeCompilationConfiguration config) {
+        mediator = med;
         ccService = service;
         ccConfig = config;
     }
-    
-    public boolean setupCodeCompilationModuleGUI(Stage mainWindow, Runnable configRefresh) {
-        if (ccService == null || ccConfig == null) {
-            return false;
-        }
-        
-        ccModuleConfirmBtn.setOnAction(ev -> {
-            ccConfig.selectModule(ccService, viewedModuleID);
 
-            showModuleGUI(ccConfig.getSelectedModuleIndex(), mainWindow, configRefresh);
-            ccModuleConfirmBtn.setDisable(true);
-            configRefresh.run();
-        });
-        
+    private boolean configurationCheck() {
+        return ccService != null && ccConfig != null && ccService.isConfigurationValid(ccConfig);
+    }
+
+
+    public void initialize() {
+        if (ccService == null || ccConfig == null) {
+            return; // TODO error
+        }
+
         List<ModuleService<ICodeCompilationModule>.ModuleInformation> infos = ccService.getAllModuleInfo();
         for (ModuleService<ICodeCompilationModule>.ModuleInformation info : infos) {
             MenuItem item = new MenuItem(info.getName());
@@ -57,15 +56,26 @@ public class CodeCompilationGUIController extends ModuleGUIController {
             });
             if (!ccModuleMenu.getItems().add(item)) {
                 ccModuleMenu.getItems().clear();
-                return false;
+                return; // TODO error
             }
         }
-        return true;
+
+        ccModuleConfirmBtn.setOnAction(ev -> {
+            ccConfig.selectModule(ccService, viewedModuleID);
+
+            showModuleGUI(ccConfig.getSelectedModuleIndex());
+            ccModuleConfirmBtn.setDisable(true);
+            mediator.updateForConfigStatus(configurationCheck());
+        });
+
     }
     
-    private boolean showModuleGUI(int moduleIndex, Stage mainWindow, Runnable configRefresh) {
+    private boolean showModuleGUI(int moduleIndex) {
         ccSubmenuPane.getChildren().clear();
-        Node moduleGUI = ccService.getModuleGUI(moduleIndex, mainWindow, configRefresh);
+        Runnable configCheck = () -> {
+            mediator.updateForConfigStatus(configurationCheck());
+        };
+        Node moduleGUI = ccService.getModuleGUI(moduleIndex, mediator.getMainWindow(), configCheck);
         if (moduleGUI != null) {
             return ccSubmenuPane.getChildren().add(moduleGUI);
         }

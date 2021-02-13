@@ -11,7 +11,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.HBox;
-import javafx.stage.Stage;
+import mainapp.PhaseMediator;
 import mainapp.configurations.SolutionScoringConfiguration;
 import mainapp.modules.interfaces.ISolutionScoringModule;
 import mainapp.results.AggregationType;
@@ -27,43 +27,28 @@ public class SolutionScoringGUIController extends ModuleGUIController {
     public HBox comboBox = null;
     public MenuButton comboMenu = null;
     
+    private PhaseMediator mediator = null;
     private SolutionScoringService ssService = null;
     private SolutionScoringConfiguration ssConfig = null;
     
     private String viewedModuleID = null;
     
-    public SolutionScoringGUIController(SolutionScoringService service, SolutionScoringConfiguration config) {
+    public SolutionScoringGUIController(PhaseMediator med, SolutionScoringService service, SolutionScoringConfiguration config) {
+        mediator = med;
         ssService = service;
         ssConfig = config;
     }
-    
-    public boolean setupSolutionScoringModuleGUI(Stage mainWindow, Runnable configRefresh) {
+
+    private boolean configurationCheck() {
+        return ssService != null && ssConfig != null && ssService.isConfigurationValid(ssConfig);
+    }
+
+
+    public void initialize() {
         if (ssService == null || ssConfig == null) {
-            return false;
+            return; // TODO error
         }
-        
-        ssModuleConfirmBtn.setOnAction(ev -> {
-            int index = ssConfig.addModule(ssService, this.viewedModuleID);
-            
-            Tab newTab = new Tab("Module #" + Integer.toString(index + 1));
-            newTab.setClosable(true);
-            newTab.setContent(ssService.getModuleGUI(index, mainWindow, configRefresh));
-            newTab.setUserData(index);
-            newTab.setOnClosed(evt -> {
-                Object data = newTab.getUserData();
-                ssConfig.removeModule(ssService, (int)data);
 
-                setComboVisibility(ssConfig.getSelectedModules().size() > 1);
-
-                configRefresh.run();
-            });
-            ssSubmenuTabs.getTabs().add(newTab);
-
-            setComboVisibility(ssConfig.getSelectedModules().size() > 1);
-            
-            configRefresh.run();
-        });
-        
         List<ModuleService<ISolutionScoringModule>.ModuleInformation> infos = ssService.getAllModuleInfo();
         for (ModuleService<ISolutionScoringModule>.ModuleInformation info : infos) {
             MenuItem item = new MenuItem(info.getName());
@@ -78,11 +63,32 @@ public class SolutionScoringGUIController extends ModuleGUIController {
             });
             if (!ssModuleMenu.getItems().add(item)) {
                 ssModuleMenu.getItems().clear();
-                return false;
+                return; // TODO error
             }
         }
-        return true;
+
+        ssModuleConfirmBtn.setOnAction(ev -> {
+            int index = ssConfig.addModule(ssService, this.viewedModuleID);
+            
+            Tab newTab = new Tab("Module #" + Integer.toString(index + 1));
+            newTab.setContent(ssService.getModuleGUI(index, mediator.getMainWindow(), () -> { mediator.updateForConfigStatus(configurationCheck()); }));
+            newTab.setClosable(true);
+            newTab.setUserData(index);
+            newTab.setOnClosed(evt -> {
+                Object data = newTab.getUserData();
+                ssConfig.removeModule(ssService, (int)data);
+
+                setComboVisibility(ssConfig.getSelectedModules().size() > 1);
+                mediator.updateForConfigStatus(configurationCheck());
+            });
+
+            ssSubmenuTabs.getTabs().add(newTab);
+            setComboVisibility(ssConfig.getSelectedModules().size() > 1);
+            mediator.updateForConfigStatus(configurationCheck());
+        });
+
     }
+    
 
     private void setComboVisibility(boolean visible) {
         comboBox.setVisible(visible);
@@ -93,24 +99,28 @@ public class SolutionScoringGUIController extends ModuleGUIController {
     public void setSumAggregation(ActionEvent e) {
         ssConfig.setAggregationType(AggregationType.SUM);
         comboMenu.setText(((MenuItem)e.getSource()).getText());
+        mediator.updateForConfigStatus(configurationCheck());
     }
     
     @FXML
     public void setMinAggregation(ActionEvent e) {
         ssConfig.setAggregationType(AggregationType.MIN);
         comboMenu.setText(((MenuItem)e.getSource()).getText());
+        mediator.updateForConfigStatus(configurationCheck());
     }
     
     @FXML
     public void setMaxAggregation(ActionEvent e) {
         ssConfig.setAggregationType(AggregationType.MAX);
         comboMenu.setText(((MenuItem)e.getSource()).getText());
+        mediator.updateForConfigStatus(configurationCheck());
     }
     
     @FXML
     public void setAvgAggregation(ActionEvent e) {
         ssConfig.setAggregationType(AggregationType.AVG);
         comboMenu.setText(((MenuItem)e.getSource()).getText());
+        mediator.updateForConfigStatus(configurationCheck());
     }
     
 }

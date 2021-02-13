@@ -57,7 +57,7 @@ public class SceneMediator {
             mainWindow.setScene(mainScene);
 
             // run evaluation cycle
-            MainSceneHandler mainSceneHandler = new MainSceneHandler(mainLoader.<MainGUIController>getController(), mainWindow, this);
+            PhaseMediator mainSceneHandler = new PhaseMediator(mainLoader.<MainGUIController>getController(), mainWindow, this);
             mainSceneHandler.runEvaluationCycle();
         } catch (Exception e) {
             ErrorWindow ew = new ErrorWindow("Evaluation cycle interrupted by an error.");
