@@ -10,6 +10,11 @@ public class MainGUIController {
     public Button nextBtn = null;
     public Button backBtn = null;
 
+    public Button resultExportBtn = null;
+
+
+    // navigation
+
     public void setPreviousPhase(Runnable previousPhaseSetup) {
         backBtn.setOnAction(ev -> {
             previousPhaseSetup.run();
@@ -50,5 +55,17 @@ public class MainGUIController {
 
     public void updateForConfigStatus(boolean valid) {
         nextBtn.setDisable(!valid);
+    }
+
+
+    // result export
+
+    public void setResultExport(Runnable export) {
+        resultExportBtn.setOnAction(ev -> {
+            export.run();
+        });
+        resultExportBtn.setDisable(false);
+        resultExportBtn.setManaged(true);
+        resultExportBtn.setVisible(true);
     }
 }

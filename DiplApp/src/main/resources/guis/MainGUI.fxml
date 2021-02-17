@@ -41,7 +41,7 @@
                     visible="false"
                     managed="false"
                 />
-                <Button text="Export results..."
+                <Button text="Export results..." fx:id="resultExportBtn"
                     visible="false"
                     managed="false"
                 />

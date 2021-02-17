@@ -5,8 +5,11 @@ import java.io.IOException;
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.Pane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import mainapp.configurations.CodeCompilationConfiguration;
 import mainapp.configurations.DuplicateDetectionConfiguration;
@@ -16,6 +19,7 @@ import mainapp.controllers.CodeCompilationGUIController;
 import mainapp.controllers.DuplicateDetectionGUIController;
 import mainapp.controllers.FileFetchingGUIController;
 import mainapp.controllers.MainGUIController;
+import mainapp.controllers.ResultExportDialogGUIController;
 import mainapp.controllers.ResultsGUIController;
 import mainapp.controllers.SolutionScoringGUIController;
 import mainapp.results.ratings.DuplicateRatings;
@@ -23,6 +27,7 @@ import mainapp.results.scores.Results;
 import mainapp.services.CodeCompilationService;
 import mainapp.services.DuplicateDetectionService;
 import mainapp.services.FileFetchingService;
+import mainapp.services.ResultExportService;
 import mainapp.services.SolutionScoringService;
 
 public class PhaseMediator {
@@ -232,6 +237,9 @@ public class PhaseMediator {
         Node phaseNode = prepareResultsPhase(evaluator.getResults(), evaluator.getDupRatings());
 
         ctrl.removePhaseNavigation();
+        ctrl.setResultExport(() -> {
+            showResultExportDialog();
+        });
         ctrl.showPhaseNode(phaseNode);
     }
 
@@ -249,6 +257,30 @@ public class PhaseMediator {
             // TODO
             System.out.println(e.getMessage());
             return null;
+        }
+    }
+
+    private void showResultExportDialog() {
+        ResultExportService service = new ResultExportService();
+
+        Stage dialog = new Stage();
+        dialog.setTitle("Export results...");
+        dialog.initModality(Modality.WINDOW_MODAL);
+        dialog.initOwner(mainWindow);
+
+        FXMLLoader resLoader = new FXMLLoader();
+        resLoader.setController(new ResultExportDialogGUIController(this, service, evaluator.getResults(), evaluator.getDupRatings()));
+        resLoader.setLocation(getClass().getResource("/guis/ResultExportDialogGUI.fxml"));
+        try {
+            Pane pane = resLoader.<Pane>load();
+            dialog.setScene(new Scene(pane));
+            dialog.sizeToScene();
+            dialog.show();
+        }
+        catch (IOException e) {
+            // TODO
+            System.out.println(e.getMessage());
+            return;
         }
     }
 
