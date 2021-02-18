@@ -15,6 +15,9 @@ repositories {
 
 dependencies {
     testImplementation     'junit:junit:4.13'
+    
+    //compile fileTree(dir: '../../ModuleProjects', include: '*/*/build/libs/*.jar')
+    //runtime fileTree(dir: '../../ModuleProjects', include: '*/*/build/libs/*.jar')
 }
 
 javafx {
@@ -35,20 +38,11 @@ tasks.withType(JavaCompile) {
     options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
 }
 
-startScripts {
-    classpath += files('$APP_HOME/lib/modules')
-    doLast {
-        def windowsScriptFile = file getWindowsScript()
-        windowsScriptFile.text = windowsScriptFile.text.replace('%APP_HOME%/lib/modules', '%APP_HOME%/lib/modules/*')
-        def unixScriptFile = file getUnixScript()
-        unixScriptFile.text = unixScriptFile.text.replace('$APP_HOME/lib/modules', '$APP_HOME/lib/modules/*')
-    }
-}
 
-distributions {
-    main {
-        contents {
-            exclude("**/.keep")
-        }
-    }
-}
+//run {
+//    doFirst {
+//        sourceSets.main.runtimeClasspath.each { println it }
+//        println ""
+//        sourceSets.main.compileClasspath.each { println it }
+//    }
+//}
