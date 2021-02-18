@@ -168,6 +168,16 @@ public class ResultsGUIController {
 
             pane.add(leftBox, 0, pos, 1, 1);
             pane.add(rightBox, 1, pos, 1, 1);
+
+            // TODO - remember to not put it next to failed tests!
+                if (pos == 0) return;
+                Label info = new Label("INFO");
+                info.setStyle("-fx-underline: true; -fx-text-weight: bold;");
+                Tooltip tip = new Tooltip("Success!");
+                tip.setStyle("-fx-font-size: 12.0;");
+                info.setTooltip(tip);
+                pane.add(info, 2, pos, 1, 1);
+            //            
         }
 
         @FXML
