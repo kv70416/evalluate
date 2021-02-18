@@ -78,7 +78,7 @@
             "
         />
 
-        <Button
+        <Button fx:id="configImportBtn"
             text="Import a configuration..."
             style="
                 -fx-font-size: 16;

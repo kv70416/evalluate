@@ -11,6 +11,7 @@ public class MainGUIController {
     public Button backBtn = null;
 
     public Button resultExportBtn = null;
+    public Button configExportBtn = null;
 
 
     // navigation
@@ -67,5 +68,16 @@ public class MainGUIController {
         resultExportBtn.setDisable(false);
         resultExportBtn.setManaged(true);
         resultExportBtn.setVisible(true);
+    }
+
+
+    // config export
+    public void setConfigExport(Runnable export) {
+        configExportBtn.setOnAction(ev -> {
+            export.run();
+        });
+        configExportBtn.setDisable(true); // TODO enable
+        configExportBtn.setManaged(true);
+        configExportBtn.setVisible(true);
     }
 }

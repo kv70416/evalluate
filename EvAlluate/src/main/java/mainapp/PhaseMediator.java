@@ -240,6 +240,9 @@ public class PhaseMediator {
         ctrl.setResultExport(() -> {
             showResultExportDialog();
         });
+        ctrl.setConfigExport(() -> {
+            // TODO
+        });
         ctrl.showPhaseNode(phaseNode);
     }
 
