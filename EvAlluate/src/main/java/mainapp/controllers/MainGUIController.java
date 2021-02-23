@@ -31,6 +31,10 @@ public class MainGUIController {
         nextBtn.setVisible(true);
     }
 
+	public void setNextPhaseBtnText(String string) {
+        nextBtn.setText(string);
+	}
+
     public void removePhaseNavigation() {
         backBtn.setOnAction(ev -> {
             return;

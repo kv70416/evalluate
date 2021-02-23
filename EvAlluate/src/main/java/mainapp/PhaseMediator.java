@@ -237,6 +237,11 @@ public class PhaseMediator {
         Node phaseNode = prepareResultsPhase(evaluator.getResults(), evaluator.getDupRatings());
 
         ctrl.removePhaseNavigation();
+        ctrl.setNextPhase(() -> {
+            mediator.showTitleScene();
+        });
+        ctrl.setNextPhaseBtnText("Return");
+        ctrl.updateForConfigStatus(true);
         ctrl.setResultExport(() -> {
             showResultExportDialog();
         });

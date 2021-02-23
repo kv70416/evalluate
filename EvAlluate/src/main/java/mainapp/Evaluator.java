@@ -319,14 +319,14 @@ public class Evaluator {
                 boolean runSuccess = ccService.runExecution(ccConfig.getSelectedModuleIndex(), student);
                 if (!runSuccess) {
                     ssService.addScoreForFail(ssIndex, student, input);
-                    results.setStudentModuleTestFail(student, Integer.toString(ssIndex), input, "Execution failed.");
+                    results.setStudentModuleTestFail(student, Integer.toString(ssIndex), input, "Runtime Error.");
                     continue;
                 }
 
                 String actualOutputPath = ccService.getOutputDataPath(ccConfig.getSelectedModuleIndex(), student);
                 if (actualOutputPath == null) {
                     ssService.addScoreForFail(ssIndex, student, input);
-                    results.setStudentModuleTestFail(student, Integer.toString(ssIndex), input, "Output reading failed.");
+                    results.setStudentModuleTestFail(student, Integer.toString(ssIndex), input, "Output fetch failed.");
                     continue;
                 }
 
@@ -360,9 +360,10 @@ public class Evaluator {
             String moduleNo = Integer.toString(ssIndex); // TODO actual name
             double totalScore = ssService.getTotalModuleScore(ssIndex, student);
             Map<String, Double> testScores = ssService.getModuleScoresPerSegment(ssIndex, student);
-            
+            Map<String, String> testMessages = ssService.getModuleMessagesPerSegment(ssIndex, student);
+
             results.setStudentModuleScore(student, moduleNo, totalScore);
-            results.setStudentModuleTestScores(student, moduleNo, testScores);
+            results.setStudentModuleTestScores(student, moduleNo, testScores, testMessages);
         }
 
         results.calculateTotalScore(student, ssConfig.getAggregationType());

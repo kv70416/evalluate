@@ -40,7 +40,11 @@ public class Results {
         ((SuccessfulStudentResult) res).setModuleScore(module, score);
     }
     
-    public void setStudentModuleTestScores(String student, String module, Map<String, Double> scores) {
+    public void setStudentModuleTestScores(String student, String module, Map<String, Double> scores, Map<String, String> messages) {
+        if (scores == null) {
+            return;
+        }
+
         StudentResult res = studentResults.get(student);
         if (res instanceof FailedStudentResult) {
             return;
@@ -51,10 +55,15 @@ public class Results {
         }
         
         for (String testName : scores.keySet()) {
-            double testScore = scores.get(testName);
-
             SuccessfulTestResult testRes = new SuccessfulTestResult();
+
+            double testScore = scores.get(testName);
             testRes.setScore(testScore);
+
+            if (messages != null && messages.containsKey(testName)) {
+                String testMessage = messages.get(testName);
+                testRes.setMessage(testMessage);
+            }
 
             ((SuccessfulStudentResult) res).addTestResult(module, testName, testRes);
         }

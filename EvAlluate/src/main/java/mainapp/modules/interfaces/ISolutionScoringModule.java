@@ -14,4 +14,5 @@ public interface ISolutionScoringModule extends IModule {
     
     public double solutionScore(String student);
     public Map<String, Double> segmentScores(String student);
+	public Map<String, String> segmentMessages(String student);
 }

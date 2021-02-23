@@ -13,8 +13,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 import mainapp.results.ratings.DuplicateRatings;
 import mainapp.results.ratings.PairwiseRating;
 import mainapp.results.ratings.StudentRating;
@@ -128,7 +131,7 @@ public class ResultsGUIController {
             double moduleScore = result.getModuleScores().get(module);
             moduleLabel.setText("Module #" + (Integer.parseInt(module) + 1) + ": " + Double.toString(moduleScore));
 
-            addGridRow(segmentPane, "Test", "Score", 0);
+            addGridRow(segmentPane, "Test", "Score", null, 0);
             int pos = 1;
             
             Map<String, TestResult> testResults = result.getTestResults(module);
@@ -139,21 +142,39 @@ public class ResultsGUIController {
 
                 if (testResult instanceof SuccessfulTestResult) {
                     double score = ((SuccessfulTestResult) testResult).getScore();
-                    addGridRow(segmentPane, test, Double.toString(score), pos);
+                    String msg = ((SuccessfulTestResult) testResult).getMessage();
+                    addGridRow(segmentPane, test, Double.toString(score), msg, pos);
                 }
 
                 if (testResult instanceof FailedTestResult) {
                     String msg = ((FailedTestResult) testResult).getFailMessage();
-                    addGridRow(segmentPane, test, msg, pos);
+                    addGridRow(segmentPane, test, msg, null, pos);
                 }
 
                 pos++;
             }
         }
 
-        private void addGridRow(GridPane pane, String leftVal, String rightVal, int pos) {
-            VBox leftBox = new VBox(new Text(leftVal));
-            VBox rightBox = new VBox(new Text(rightVal));
+        private void addGridRow(GridPane pane, String leftVal, String rightVal, String info, int pos) {
+            HBox leftBox = new HBox(new Text(leftVal));
+
+            HBox rightBox = null;
+            if (info == null) {
+                rightBox = new HBox(new Text(rightVal));
+            }
+            else {
+                Label infoLabel = new Label("INFO");
+                infoLabel.setStyle("-fx-underline: true; -fx-text-weight: bold;");
+                Tooltip infoTip = new Tooltip(info);
+                infoTip.setStyle("-fx-font-size: 12.0;");
+                infoTip.setShowDelay(Duration.ZERO);
+                infoLabel.setTooltip(infoTip);
+
+                HBox valText = new HBox(new Text(rightVal));
+                rightBox = new HBox(valText, infoLabel);
+                HBox.setHgrow(valText, Priority.ALWAYS);
+            }
+
             if (pos == 0) {
                 leftBox.setStyle("-fx-border-style: solid; -fx-border-color: #105B3D; -fx-border-width: 0 1 2 0");
                 rightBox.setStyle("-fx-border-style: solid; -fx-border-color: #105B3D; -fx-border-width: 0 0 2 1");
@@ -238,8 +259,8 @@ public class ResultsGUIController {
         }
 
         private void addGridRow(GridPane pane, String leftVal, String rightVal, int pos) {
-            VBox leftBox = new VBox(new Text(leftVal));
-            VBox rightBox = new VBox(new Text(rightVal));
+            HBox leftBox = new HBox(new Text(leftVal));
+            HBox rightBox = new HBox(new Text(rightVal));
             if (pos == 0) {
                 leftBox.setStyle("-fx-border-style: solid; -fx-border-color: #105B3D; -fx-border-width: 0 1 2 0");
                 rightBox.setStyle("-fx-border-style: solid; -fx-border-color: #105B3D; -fx-border-width: 0 0 2 1");

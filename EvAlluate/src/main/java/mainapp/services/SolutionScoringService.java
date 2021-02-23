@@ -76,4 +76,9 @@ public class SolutionScoringService extends ModuleService<ISolutionScoringModule
         return instances.get(index).segmentScores(student);
     }
 
+	public Map<String, String> getModuleMessagesPerSegment(int index, String student) {
+        if (badIndex(index)) return null;
+        return instances.get(index).segmentMessages(student);
+	}
+
 }
