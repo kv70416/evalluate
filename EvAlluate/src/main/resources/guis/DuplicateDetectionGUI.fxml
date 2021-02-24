@@ -48,13 +48,13 @@
             <children>
                 <HBox>
                     <children>
-                        <Label text="Description: " />
-                        <Label fx:id="ddModuleDescription" text="-" />
+                        <Label fx:id="ddModuleDescLabel" text="Description: " />
+                        <Label fx:id="ddModuleDescription" text="-" wrapText="true" />
                     </children>
                 </HBox>
                 <HBox>
                     <children>
-                        <Label text="Module ID: " />
+                        <Label fx:id="ddModuleIDLabel" text="Module ID: " />
                         <Label fx:id="ddModuleID" text="-" />
                     </children>
                 </HBox>

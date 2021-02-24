@@ -16,7 +16,9 @@ import mainapp.services.ModuleService;
 public class FileFetchingGUIController extends ModuleGUIController {
     public MenuButton ffModuleMenu = null;
     public Button ffModuleConfirmBtn = null;
+    public Label ffModuleDescLabel = null;
     public Label ffModuleDescription = null;
+    public Label ffModuleIDLabel = null;
     public Label ffModuleID = null;
     public Pane ffSubmenuPane = null;
     
@@ -42,6 +44,9 @@ public class FileFetchingGUIController extends ModuleGUIController {
         if (ffService == null || ffConfig == null) {
             return; // TODO error
         }
+
+        ffModuleDescLabel.setMinWidth(Label.USE_PREF_SIZE);
+        ffModuleIDLabel.setMinWidth(Label.USE_PREF_SIZE);
 
         List<ModuleService<IFileFetchingModule>.ModuleInformation> infos = ffService.getAllModuleInfo();
         for (ModuleService<IFileFetchingModule>.ModuleInformation info : infos) {

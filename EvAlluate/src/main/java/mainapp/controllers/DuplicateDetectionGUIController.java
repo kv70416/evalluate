@@ -22,7 +22,9 @@ public class DuplicateDetectionGUIController extends ModuleGUIController {
     public Button ddModuleConfirmBtn = null;
     public TabPane ddSubmenuTabs = null;
     public MenuButton ddModuleMenu = null;
+    public Label ddModuleDescLabel = null;
     public Label ddModuleDescription = null;
+    public Label ddModuleIDLabel = null;
     public Label ddModuleID = null;
     public HBox comboBox = null;
     public MenuButton comboMenu = null;
@@ -48,6 +50,9 @@ public class DuplicateDetectionGUIController extends ModuleGUIController {
         if (ddService == null || ddConfig == null) {
             return; // TODO error
         }
+
+        ddModuleDescLabel.setMinWidth(Label.USE_PREF_SIZE);
+        ddModuleIDLabel.setMinWidth(Label.USE_PREF_SIZE);
 
         List<ModuleService<IDuplicateDetectionModule>.ModuleInformation> infos = ddService.getAllModuleInfo();
         for (ModuleService<IDuplicateDetectionModule>.ModuleInformation info : infos) {

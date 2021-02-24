@@ -21,7 +21,9 @@ import mainapp.services.SolutionScoringService;
 public class SolutionScoringGUIController extends ModuleGUIController {
     public MenuButton ssModuleMenu = null;
     public Button ssModuleConfirmBtn = null;
+    public Label ssModuleDescLabel = null;
     public Label ssModuleDescription = null;
+    public Label ssModuleIDLabel = null;
     public Label ssModuleID = null;
     public TabPane ssSubmenuTabs = null;
     public HBox comboBox = null;
@@ -48,6 +50,9 @@ public class SolutionScoringGUIController extends ModuleGUIController {
         if (ssService == null || ssConfig == null) {
             return; // TODO error
         }
+
+        ssModuleDescLabel.setMinWidth(Label.USE_PREF_SIZE);
+        ssModuleIDLabel.setMinWidth(Label.USE_PREF_SIZE);
 
         List<ModuleService<ISolutionScoringModule>.ModuleInformation> infos = ssService.getAllModuleInfo();
         for (ModuleService<ISolutionScoringModule>.ModuleInformation info : infos) {

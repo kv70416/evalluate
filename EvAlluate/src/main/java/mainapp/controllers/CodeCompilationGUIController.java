@@ -16,7 +16,9 @@ import mainapp.services.ModuleService;
 public class CodeCompilationGUIController extends ModuleGUIController {
     public MenuButton ccModuleMenu = null;
     public Button ccModuleConfirmBtn = null;
+    public Label ccModuleDescLabel = null;
     public Label ccModuleDescription = null;
+    public Label ccModuleIDLabel = null;
     public Label ccModuleID = null;
     public Pane ccSubmenuPane = null;
 
@@ -41,6 +43,9 @@ public class CodeCompilationGUIController extends ModuleGUIController {
         if (ccService == null || ccConfig == null) {
             return; // TODO error
         }
+
+        ccModuleDescLabel.setMinWidth(Label.USE_PREF_SIZE);
+        ccModuleIDLabel.setMinWidth(Label.USE_PREF_SIZE);
 
         List<ModuleService<ICodeCompilationModule>.ModuleInformation> infos = ccService.getAllModuleInfo();
         for (ModuleService<ICodeCompilationModule>.ModuleInformation info : infos) {
