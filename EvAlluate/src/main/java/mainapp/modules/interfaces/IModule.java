@@ -12,15 +12,18 @@ public interface IModule {
      */
     public Node moduleGUI(Stage mainWindow, Runnable mainSceneRefresh);
 
-    /*
-
-    TODO
-
+    /**
+     * 
+     * @param config
+     * @return
+     */
     public boolean importConfiguration(String config);
 
+    /**
+     * 
+     * @return
+     */
     public String exportConfiguration();
-
-    */
 
     /**
      * 

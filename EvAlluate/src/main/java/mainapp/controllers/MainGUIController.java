@@ -80,7 +80,7 @@ public class MainGUIController {
         configExportBtn.setOnAction(ev -> {
             export.run();
         });
-        configExportBtn.setDisable(true); // TODO enable
+        configExportBtn.setDisable(false);
         configExportBtn.setManaged(true);
         configExportBtn.setVisible(true);
     }

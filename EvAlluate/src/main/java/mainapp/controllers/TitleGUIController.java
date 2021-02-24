@@ -12,7 +12,4 @@ public class TitleGUIController {
     public Button startBtn = null;
     public Button configImportBtn = null;
 
-    public void initialize() {
-        configImportBtn.setDisable(true); // TODO enable
-    }
 }

@@ -29,4 +29,36 @@ public class Aggregation {
                 return Double.NaN;
         }
     }
+
+    public static String typeToString(AggregationType type) {
+        if (type == null) return null;
+        switch(type) {
+            case SUM:
+                return "sum";
+            case MIN:
+                return "min";
+            case MAX:
+                return "max";
+            case AVG:
+                return "avg";
+            default:
+                return null;
+        }
+    }
+
+    public static AggregationType stringToType(String typeStr) {
+        if (typeStr == null) return null;
+        switch(typeStr) {
+            case "sum":
+                return AggregationType.SUM;
+            case "min":
+                return AggregationType.MIN;
+            case "max":
+                return AggregationType.MAX;
+            case "avg":
+                return AggregationType.AVG;
+            default:
+                return null;
+        }
+    }
 }

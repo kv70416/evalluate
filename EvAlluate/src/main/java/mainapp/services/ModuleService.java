@@ -83,10 +83,21 @@ public abstract class ModuleService<IModuleType extends IModule> {
         return instances.get(index).moduleGUI(mainWindow, mainSceneRefresh);
     }
     
+    public boolean importConfiguration(int index, String config) {
+        if (badIndex(index)) return false;
+        return instances.get(index).importConfiguration(config);
+    }
+    
+    public String exportConfiguration(int index) {
+        if (badIndex(index)) return null;
+        return instances.get(index).exportConfiguration();
+    }
+    
     public boolean isModuleConfigured(int index) {
         if (badIndex(index)) return false;
         return instances.get(index).isConfigured();
     }
+    
     
     public abstract boolean isConfigurationValid(ModuleConfiguration config);
     

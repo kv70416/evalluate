@@ -1,6 +1,10 @@
 package mainapp;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Map;
 
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
@@ -9,9 +13,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Pane;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import mainapp.configurations.CodeCompilationConfiguration;
+import mainapp.configurations.ConfigurationParser;
 import mainapp.configurations.DuplicateDetectionConfiguration;
 import mainapp.configurations.FileFetchingConfiguration;
 import mainapp.configurations.SolutionScoringConfiguration;
@@ -47,6 +53,23 @@ public class PhaseMediator {
     public void runEvaluationCycle() {
         evaluator = new Evaluator(mediator);
         goToFileFetchingPhase();
+    }
+
+    public void runEvaluationCycleWithConfig(String config) {
+        evaluator = new Evaluator(mediator);
+
+        if (evaluator.getFFConfig().setImportedConfiguration(ConfigurationParser.parseFFConfiguration(config), evaluator.getFFService()) &&
+            evaluator.getCCConfig().setImportedConfiguration(ConfigurationParser.parseCCConfiguration(config), evaluator.getCCService()) &&
+            evaluator.getSSConfig().setImportedConfiguration(ConfigurationParser.parseSSConfiguration(config), evaluator.getSSService()) &&
+            evaluator.getDDConfig().setImportedConfiguration(ConfigurationParser.parseDDConfiguration(config), evaluator.getDDService()) &&
+            evaluator.getSSConfig().setImportedAggregation(ConfigurationParser.parseSSAggregation(config)) &&
+            evaluator.getDDConfig().setImportedAggregation(ConfigurationParser.parseDDAggregation(config))
+        ) {
+            goToEvaluationPhase();
+        }
+        else {
+            // TODO error, return to title
+        }
     }
 
     // UTIL
@@ -246,7 +269,7 @@ public class PhaseMediator {
             showResultExportDialog();
         });
         ctrl.setConfigExport(() -> {
-            // TODO
+            exportConfigFile();
         });
         ctrl.showPhaseNode(phaseNode);
     }
@@ -289,6 +312,36 @@ public class PhaseMediator {
             // TODO
             System.out.println(e.getMessage());
             return;
+        }
+    }
+
+    private void exportConfigFile() {
+        FileChooser fileChooser = new FileChooser();
+        File selectedFile = fileChooser.showSaveDialog(mainWindow);
+        if (selectedFile == null) {
+            return;
+        }
+        try {
+            selectedFile.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace(); // TODO
+            return;
+        }
+
+        Map<String, String> ffC = evaluator.getFFConfig().exportConfiguration(evaluator.getFFService());
+        Map<String, String> ccC = evaluator.getCCConfig().exportConfiguration(evaluator.getCCService());
+        Map<String, String> ssC = evaluator.getSSConfig().exportConfiguration(evaluator.getSSService());
+        Map<String, String> ddC = evaluator.getDDConfig().exportConfiguration(evaluator.getDDService());
+        String ssA = evaluator.getSSConfig().exportAggregation();
+        String ddA = evaluator.getDDConfig().exportAggregation();
+
+        String configString = ConfigurationParser.buildConfigurationString(ffC, ccC, ssC, ddC, ssA, ddA);
+
+        try (PrintWriter writer = new PrintWriter(selectedFile)) {
+            writer.print(configString);
+        }
+        catch (FileNotFoundException e) {
+            // TODO
         }
     }
 
