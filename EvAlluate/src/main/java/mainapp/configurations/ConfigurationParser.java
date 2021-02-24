@@ -43,8 +43,8 @@ public class ConfigurationParser {
     }
 
     private static Map<String, String> parseModConfiguration(String config, String key) {
-        JSONObject jsonConfig = new JSONObject(config);
         try {
+            JSONObject jsonConfig = new JSONObject(config);
             JSONArray modArray = jsonConfig.getJSONArray(key);
             Map<String, String> ret = new HashMap<>();
             for (int i = 0; i < modArray.length(); i++) {
