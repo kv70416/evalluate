@@ -52,7 +52,8 @@ public class SceneMediator {
                     showMainScene();
                 }
                 else {
-                    // TODO error
+                    ErrorWindow ew = new ErrorWindow("Failed to load configuration.");
+                    ew.showOverStage(mainWindow);
                 }
             });
 

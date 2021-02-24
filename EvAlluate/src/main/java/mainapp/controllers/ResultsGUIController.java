@@ -129,7 +129,7 @@ public class ResultsGUIController {
 
         public void fill(SuccessfulStudentResult result, String module) {
             double moduleScore = result.getModuleScores().get(module);
-            moduleLabel.setText("Module #" + (Integer.parseInt(module) + 1) + ": " + Double.toString(moduleScore));
+            moduleLabel.setText("Module " + module + ": " + Double.toString(moduleScore));
 
             addGridRow(segmentPane, "Test", "Score", null, 0);
             int pos = 1;
@@ -240,8 +240,7 @@ public class ResultsGUIController {
         public Button expandBtn = null;
 
         public void fill(String module, StudentRating studentRating) {
-            moduleLabel.setText("Module #" + (Integer.parseInt(module) + 1) + ": "
-                    + String.format("%.2f", studentRating.getModuleRatings().get(module)));
+            moduleLabel.setText("Module " + module + ": " + String.format("%.2f", studentRating.getModuleRatings().get(module)));
 
             addGridRow(comparisonList, "Student", "Rating", 0);
 

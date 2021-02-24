@@ -7,8 +7,8 @@ public class MainApplication extends Application {
     
     @Override
     public void start(Stage primaryStage) throws Exception {
-        // set app title - TODO
-        primaryStage.setTitle("MainApp");
+        // set app title
+        primaryStage.setTitle("EvAlluate");
         
         // set up the window
         primaryStage.setWidth(800);

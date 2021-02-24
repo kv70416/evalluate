@@ -251,7 +251,7 @@ public class Evaluator {
             }
 
             for (String student : studentList) {
-                String moduleNo = Integer.toString(ddIndex); // TODO
+                String moduleNo = "#" + Integer.toString(ddIndex + 1); // TODO include actual name?
                 
                 double dupRating = ddService.getStudentDuplicateRating(ddIndex, student);
                 Map<String, Double> pairwiseDupRatings = ddService.getStudentComparisonRatings(ddIndex, student);
@@ -357,7 +357,7 @@ public class Evaluator {
         List<Integer> ssModuleIndices = ssConfig.getSelectedModules();
         
         for (int ssIndex : ssModuleIndices) {
-            String moduleNo = Integer.toString(ssIndex); // TODO actual name
+            String moduleNo = "#" + Integer.toString(ssIndex + 1); // TODO include actual name?
             double totalScore = ssService.getTotalModuleScore(ssIndex, student);
             Map<String, Double> testScores = ssService.getModuleScoresPerSegment(ssIndex, student);
             Map<String, String> testMessages = ssService.getModuleMessagesPerSegment(ssIndex, student);

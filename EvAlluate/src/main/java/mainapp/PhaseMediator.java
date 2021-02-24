@@ -68,7 +68,11 @@ public class PhaseMediator {
             goToEvaluationPhase();
         }
         else {
-            // TODO error, return to title
+            ErrorWindow ew = new ErrorWindow("Imported configuration is invalid.");
+            ew.setActionOnClose(() -> {
+                mediator.showTitleScene();
+            });
+            mediator.showErrorWindow(ew);
         }
     }
 
@@ -319,12 +323,16 @@ public class PhaseMediator {
         FileChooser fileChooser = new FileChooser();
         File selectedFile = fileChooser.showSaveDialog(mainWindow);
         if (selectedFile == null) {
+            ErrorWindow ew = new ErrorWindow("Configuration export failed.");
+            mediator.showErrorWindow(ew);
             return;
         }
+        
         try {
             selectedFile.createNewFile();
         } catch (IOException e) {
-            e.printStackTrace(); // TODO
+            ErrorWindow ew = new ErrorWindow("Configuration export failed.");
+            mediator.showErrorWindow(ew);
             return;
         }
 
@@ -341,7 +349,8 @@ public class PhaseMediator {
             writer.print(configString);
         }
         catch (FileNotFoundException e) {
-            // TODO
+            ErrorWindow ew = new ErrorWindow("Configuration export failed.");
+            mediator.showErrorWindow(ew);
         }
     }
 
